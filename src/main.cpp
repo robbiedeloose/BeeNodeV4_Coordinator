@@ -8,6 +8,19 @@
 #define flashChipCSPin 4
 #define buildInLed 13
 
+#define scaleClock 15
+#define scaleData1 5
+#define scaleData2 6
+#define scaleData3 7
+#define scaleData4 8
+#define scaleData5 9
+#define scaleData6 10
+#define scaleData7 16
+#define scaleData8 17
+#define scaleData9 18
+
+
+
 ///////////////////////// General Stuff ////////////////////////////////////////
 #include <Arduino.h>
 #include <Wire.h>
@@ -33,9 +46,7 @@
   uint8_t coordinatorAddress[8];
 
 /******************************* Communication ********************************/
-  ///////////////////////////////////////// GPRS /////////////////////////////////
   #define TINY_GSM_MODEM_SIM800
-  #include <PubSubClient.h>
   #include <TinyGsmClient.h>
   // Your GPRS credentials
   const char apn[] = "hologram";
@@ -49,10 +60,6 @@
 
   TinyGsm modem(Serial1);
   TinyGsmClient client(modem);
-  PubSubClient mqtt(client);
-  ///////////////////////////////////// MQTT //////////////////////////////////////
-  char mqttClient[12] = "";
-
 /******************************* Sensors **************************************/
   //////////////////////////////// HUMIDITY //////////////////////////////////////
   #include "SparkFunHTU21D.h"
@@ -60,17 +67,13 @@
   //////////////////////////////// LUX ///////////////////////////////////////////
   #include <BH1750.h>
   BH1750 lightMeter;
-  //////////////////////////////// Scale /////////////////////////////////////////
+
+////////////////////////////////// SCALES ////////////////////////////////////////
   #include "HX711-multi.h"
-  // Pins to the load cell amp
-  #define CLK 2      // clock pin to the load cell amp
-  #define DOUT1 3    // data pin to the first lca
-  #define DOUT2 4    // data pin to the second lca
-  #define DOUT3 5    // data pin to the third lca
-  byte DOUTS[3] = {DOUT1, DOUT2, DOUT3};
+  byte DOUTS[3] = {scaleData1, scaleData2, scaleData3};
   #define CHANNEL_COUNT sizeof(DOUTS)/sizeof(byte)
   long int results[CHANNEL_COUNT];
-  HX711MULTI scales(CHANNEL_COUNT, DOUTS, CLK);
+  HX711MULTI scales(CHANNEL_COUNT, DOUTS, scaleClock);
 
 /******************************* STRUCTS **************************************/
   ///////////////////////////////////// STRUCTS & STRUCT ARAYS ///////////////////
@@ -84,7 +87,7 @@
 
 /******************************* FUNCTION DECLARATIONS ************************/
   ////////////////////////// FUNCTION DECLARATIONS ///////////////////////////////
-  // something
+  // Something
   void setPinModes();
   void readIdFromEepRom();
   void initFlash();
@@ -93,44 +96,43 @@
   void setRtcAlarm(uint8_t alarmMinutes);
   void sleepCoordinator();
   void alarmMatch();
-  // sensors
+  // Sensors
   void getCoordinatorData(LocalData_t *local);
   void getWeatherData(LocalData_t *local);
   void getScaleData(LocalData_t *local);
-  // communications
+  void showLocalData(LocalData_t *local);
+  // Communications
+  void gprsTest();
   void gprsResetModem();
   void gprsConnectNetwork();
   void gprsEnd();
   // MQTT
-  void mqttRegister();
-  void mqttSendData(LocalData_t *local);
+  //void mqttRegister();
+  //void mqttSendData(LocalData_t *local);
 
 /////////////// SETUP //////////////////////////////////////////////////////////
 void setup() {
-  // define used pin states and put everything else high
+  // Define used pin states and put everything else high
   setPinModes();
-  delay(1000);
-  // delay startup to allow programming
+  // start serials 
+  Serial.begin(9600);
+  Serial1.begin(9600);
+  delay(3000);
+  // Delay startup to allow programming
   delayStartup();
-  delay(30000);
-
-  // init serials
-  //Serial.begin(9600);
-  //Serial1.begin(9600);
- 
   Wire.begin();
-  // init serial flash
+  // Init serial flash
   initFlash();
-  // init sensors
+  // Get id
+  readIdFromEepRom();
+  // Init sensors
   myHumidity.begin();
   lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
-  // get id
-  readIdFromEepRom();
-  // init communications
-  mqtt.setServer(broker, mqttPort);
-  mqttRegister();
-  // display information to serial
+  // Display information to serial
   displayCoordinatorData();
+  // Init communications
+  gprsTest();
+  
 }
 
 /////////////// LOOP ///////////////////////////////////////////////////////////
@@ -143,8 +145,10 @@ void loop() {
     getCoordinatorData(&localData);
     getWeatherData(&localData);
     getScaleData(&localData);
+    // show
+    showLocalData(&localData);
     // send
-    mqttSendData(&localData);
+    //mqttSendData(&localData);
     // sleep
     #ifdef DEBUG
       delay(10000);
@@ -180,20 +184,22 @@ void initFlash(){
 }
 
 void displayCoordinatorData(){
-  Serial.println(F("BeeNode v4"));
+  Serial.println(F("BeeNode v4.0.1a"));
   char buf[17] = "";
   sprintf(buf, "%02X%02X%02X%02X%02X%02X%02X%02X", coordinatorAddress[0], coordinatorAddress[1], coordinatorAddress[2], coordinatorAddress[3], coordinatorAddress[4], coordinatorAddress[5], coordinatorAddress[6], coordinatorAddress[7]);
-  Serial.print(" Id: ");
+  Serial.print("Id: ");
   Serial.println(buf);
 } 
 
 void delayStartup(){
    /***** IMPORTANT DELAY FOR CODE UPLOAD BEFORE USB PORT DETACH DURING SLEEP *****/
-  uint8_t i = 0;
-  while(i < 51){
-      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-      i++;   
+  for(uint8_t i = 0; i < 51; i++)
+  {
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    Serial.print(".");
+    delay(500);
   }
+  Serial.println();
 }
 /******************************* RTC + SLEEP **********************************/
 void setRtcAlarm(uint8_t alarmMinutes){
@@ -220,43 +226,38 @@ void getWeatherData(LocalData_t *local) {
   local->baseTemp = myHumidity.readTemperature() * 100;
   local->baseHum = myHumidity.readHumidity() * 100;
   local->baseLux = lightMeter.readLightLevel();
-  
 }
 
 void getScaleData(LocalData_t *local) {
-  // todo
+  scales.read(results);
+}
+
+void showLocalData(LocalData_t *local){
+  Serial.print("Temperature: ");
+  Serial.println(local->baseTemp);
+  Serial.print("Humidity: ");
+  Serial.println(local->baseHum);
+  Serial.print("Lux: ");
+  Serial.println(local->baseLux);
+  Serial.print("Scale1: ");
+  Serial.println(results[0]);
+  Serial.print("Scale2: ");
+  Serial.println(results[1]);
+  Serial.print("Scale3: ");
+  Serial.println(results[2]);
+
 }
 
 /******************************* Communication ********************************/
 //////////// MQTT Code /////////////////////////////////////////////////////////
-void mqttRegister() {
-  gprsResetModem();
-  gprsConnectNetwork();
-  if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
-    mqtt.publish("c/r", mqttClient);
-  }
-  gprsEnd();
-}
-
-void mqttSendData(LocalData_t *local) {
-  gprsResetModem();
-  gprsConnectNetwork();
-  /*for (int b = 0; b < BUFFERSIZE; b++) {
-    if (plBuffer[b].temp[0] != 0) {
-      Serial.print(F("Send buffer "));
-      Serial.println(b);
-      if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
-        char buf[120] = "";
-        sprintf(buf, "%02X%02X%02X%02X,%d,%d,%d,%d,%d,%d,%u,%u,%u,%u,%d", plBuffer[b].id[0], plBuffer[b].id[1], plBuffer[b].id[2], plBuffer[b].id[3], plBuffer[b].temp[0], plBuffer[b].temp[1], plBuffer[b].temp[2], plBuffer[b].temp[3], plBuffer[b].temp[4], plBuffer[b].temp[5],plBuffer[b].humidity,plBuffer[b].bat,local->baseTemp,local->baseHum,local->baseLux);
-        mqtt.publish("h/d", buf);
-      }
-    }
-  }*/
-  mqtt.disconnect();
-  gprsEnd();
-}
 
 //////////// init gprs, connect and disconnect from network ////////////////////
+void gprsTest() {
+  gprsResetModem();
+  gprsConnectNetwork();
+  gprsEnd();
+}
+
 void gprsResetModem() {
   modem.restart();
   String modemInfo = modem.getModemInfo();
