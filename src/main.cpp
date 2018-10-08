@@ -12,19 +12,17 @@
 #define scaleData1 5
 #define scaleData2 6
 #define scaleData3 7
-#define scaleData4 8
-#define scaleData5 9
-#define scaleData6 10
-#define scaleData7 16
-#define scaleData8 17
-#define scaleData9 18
-
-
+#define scaleData4 16
+#define scaleData5 17
+#define scaleData6 18
+#define scaleData7 8
+#define scaleData8 9
+#define scaleData9 10
 
 ///////////////////////// General Stuff ////////////////////////////////////////
-#include <Arduino.h>
-#include <Wire.h>
-#include <SPI.h>
+  #include <Arduino.h>
+  #include <Wire.h>
+  #include <SPI.h>
 
 /******************************* BOARD FUNCTIONS ******************************/
   #define Serial SerialUSB 
@@ -60,6 +58,9 @@
 
   TinyGsm modem(Serial1);
   TinyGsmClient client(modem);
+  PubSubClient mqtt(client);
+  char mqttClient[12] = "";
+
 /******************************* Sensors **************************************/
   //////////////////////////////// HUMIDITY //////////////////////////////////////
   #include "SparkFunHTU21D.h"
@@ -70,7 +71,7 @@
 
 ////////////////////////////////// SCALES ////////////////////////////////////////
   #include "HX711-multi.h"
-  byte DOUTS[3] = {scaleData1, scaleData2, scaleData3};
+  byte DOUTS[6] = {scaleData1, scaleData2, scaleData3, scaleData4, scaleData5, scaleData6};
   #define CHANNEL_COUNT sizeof(DOUTS)/sizeof(byte)
   long int results[CHANNEL_COUNT];
   HX711MULTI scales(CHANNEL_COUNT, DOUTS, scaleClock);
@@ -151,7 +152,7 @@ void loop() {
     //mqttSendData(&localData);
     // sleep
     #ifdef DEBUG
-      delay(10000);
+      delay(2000);
     #else
       sleepCoordinator();
     #endif
@@ -161,6 +162,7 @@ void loop() {
 /******************************* BOARD SPECIFIC *******************************/
 
 void setPinModes(){
+  pinMode(A5,INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
 }
@@ -219,7 +221,7 @@ void alarmMatch(){}
 /******************************* sensors **************************************/
 void getCoordinatorData(LocalData_t *local){
   // voltage / id
-  local->baseBat = 0;
+  local->baseBat = analogRead(A5);
 }
 
 void getWeatherData(LocalData_t *local) {
@@ -229,7 +231,7 @@ void getWeatherData(LocalData_t *local) {
 }
 
 void getScaleData(LocalData_t *local) {
-  scales.read(results);
+    scales.read(results);
 }
 
 void showLocalData(LocalData_t *local){
@@ -239,13 +241,20 @@ void showLocalData(LocalData_t *local){
   Serial.println(local->baseHum);
   Serial.print("Lux: ");
   Serial.println(local->baseLux);
+  Serial.print("Bat: ");
+  Serial.println(local->baseBat);
   Serial.print("Scale1: ");
   Serial.println(results[0]);
   Serial.print("Scale2: ");
   Serial.println(results[1]);
   Serial.print("Scale3: ");
   Serial.println(results[2]);
-
+  Serial.print("Scale4: ");
+  Serial.println(results[3]);
+  Serial.print("Scale5: ");
+  Serial.println(results[4]);
+  Serial.print("Scale6: ");
+  Serial.println(results[5]);
 }
 
 /******************************* Communication ********************************/
