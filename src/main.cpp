@@ -1,26 +1,27 @@
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+// BEELOG V4 
+////////////////////////////////////////////////////////////////////////////////
 ///////////////////////// OPTIONS //////////////////////////////////////////////
-#define SLEEPTIMER 1      // how often do we want to send data (in minutes)
-#define STARTDELAY 5      // delay start of programm, needed for reprogamming when using sleep
-#define DEBUG             // comment to use sleep
+  #define SLEEPTIMER 1      // how often do we want to send data (in minutes)
+  #define STARTDELAY 20      // delay start of programm, needed for reprogamming when using sleep
+  #define DEBUG             // comment to use sleep
 ///////////////////////// PIN DEFINES //////////////////////////////////////////
-#define flashChipCSPin 4
-#define buildInLed 13
+  #define flashChipCSPin 4
+  #define buildInLed 13
 
-#define scaleClock 15
-#define scaleData1 5
-#define scaleData2 6
-#define scaleData3 7
-#define scaleData4 16
-#define scaleData5 17
-#define scaleData6 18
-#define scaleData7 8
-#define scaleData8 9
-#define scaleData9 10
+  #define scaleClock 15
+  #define scaleData1 5
+  #define scaleData2 6
+  #define scaleData3 7
+  #define scaleData4 16
+  #define scaleData5 17
+  #define scaleData6 18
+  #define scaleData7 8
+  #define scaleData8 9
+  #define scaleData9 10
 
-#define dtrPin 11
+  #define dtrPin 11
+  #define reset
 
 ///////////////////////// General Stuff ////////////////////////////////////////
   #include <Arduino.h>
@@ -112,10 +113,11 @@
   void gprsResetModem();
   void gprsConnectNetwork();
   void gprsEnd();
+  void gprsSleep();
   // MQTT
-  void initMqtt();
+  void mqttInit();
   void mqttRegister();
-  //void mqttSendData(LocalData_t *local);
+  void mqttSendData(LocalData_t *local);
 
 /******************************************************************************/
 
@@ -123,28 +125,31 @@
 void setup() {
   // Define used pin states and put everything else high
   setPinModes();
-  // start serials 
-  Serial.begin(9600);
-  Serial1.begin(9600);
-  delay(3000);
-  // Delay startup to allow programming
-  delayStartup();
+  // start serials and Wire
   Wire.begin();
+  Serial.begin(115200);
+  Serial1.begin(115200);
+  delay(3000);
   // Init serial flash
   initFlash();
   // Get id
   readIdFromEepRom();
+    // Delay startup to allow programming
+  delayStartup();
+  // Display information to serial
+  displayCoordinatorData();  
+
   // init communications
-  initMqtt();
+  mqttInit();
   // Init sensors
   myHumidity.begin();
   lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
-  // Display information to serial
-  displayCoordinatorData();  
 }
 
 /////////////// LOOP ///////////////////////////////////////////////////////////
 void loop() {
+    Serial.println(":: Loop");
+    digitalWrite(LED_BUILTIN, HIGH);
     LocalData_t localData;
 
     // set new alarm
@@ -156,10 +161,11 @@ void loop() {
     // show
     showLocalData(&localData);
     // send
-    //mqttSendData(&localData);
+    mqttSendData(&localData);
     // sleep
     #ifdef DEBUG
-      delay(2000);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(60000);
     #else
       sleepCoordinator();
     #endif
@@ -169,8 +175,13 @@ void loop() {
 /******************************* BOARD SPECIFIC *******************************/
 void setPinModes(){
   pinMode(A5,INPUT);
+  //led
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
+  //gprssleep
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+
 }
 
 void readIdFromEepRom(){
@@ -204,7 +215,7 @@ void displayCoordinatorData(){
 void delayStartup(){
    /***** IMPORTANT DELAY FOR CODE UPLOAD BEFORE USB PORT DETACH DURING SLEEP *****/
 
-  for(uint8_t i = 0; i < (STARTDELAY*2); i++)
+  for(uint8_t i = 0; i < (STARTDELAY*2)+1; i++)
   {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
     Serial.print(".");
@@ -215,6 +226,7 @@ void delayStartup(){
 
 /******************************* RTC + SLEEP **********************************/
 void setRtcAlarm(uint8_t alarmMinutes){
+    Serial.println(":: setRtcAlarm");
     rtc.setAlarmSeconds(0);
     rtc.setAlarmMinutes((rtc.getMinutes()+alarmMinutes)%60);
     rtc.enableAlarm(rtc.MATCH_MMSS);
@@ -223,6 +235,7 @@ void setRtcAlarm(uint8_t alarmMinutes){
 
 void sleepCoordinator(){
     Serial.println(F("sleep"));
+    digitalWrite(LED_BUILTIN, LOW);
     delay(500); // give serial time to complete before node goes to sleep
 }
 
@@ -230,25 +243,25 @@ void alarmMatch(){}
 
 /******************************* sensors **************************************/
 void getCoordinatorData(LocalData_t *local){
+  Serial.println(":: getCoordinatorData");
   // voltage / id
-  
-  int sensorValue = analogRead(A5);
-  float voltage= sensorValue * (5.0 / 1023.0);
-
   local->baseBat = analogRead(A5)*4.3;
 }
 
 void getWeatherData(LocalData_t *local) {
+  Serial.println(":: getWeatherData");
   local->baseTemp = myHumidity.readTemperature() * 100;
   local->baseHum = myHumidity.readHumidity() * 100;
   local->baseLux = lightMeter.readLightLevel();
 }
 
 void getScaleData(LocalData_t *local) {
+  Serial.println(":: getScaleData");
     scales.read(results);
 }
 
 void showLocalData(LocalData_t *local){
+  Serial.println(":: showLocalData");
   Serial.print("Temperature: ");
   Serial.println(local->baseTemp);
   Serial.print("Humidity: ");
@@ -273,7 +286,8 @@ void showLocalData(LocalData_t *local){
 
 /******************************* Communication ********************************/
 //////////// MQTT Code /////////////////////////////////////////////////////////
-void initMqtt(){
+void mqttInit(){
+  Serial.println(":: mqttInit");
   mqtt.setServer(broker, mqttPort);
   for(size_t i = 0; i < 17; i++)
   {
@@ -287,6 +301,7 @@ void initMqtt(){
 }
 
 void mqttRegister() {
+  Serial.println(":: mqttRegsister");
   gprsResetModem();
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
@@ -295,19 +310,26 @@ void mqttRegister() {
   mqtt.disconnect();
   gprsEnd();
   Serial.println("Registered CO");
+  //gprsSleep();
 }
 
 void mqttSendData(LocalData_t *local) {
+  Serial.println(":: mqttSendData");
   gprsResetModem();
   gprsConnectNetwork();
       if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
-        //char buf[120] = "";
-        //sprintf(buf, "%02X%02X%02X%02X,%d,%d,%d,%d,%d,%d,%u,%u,%u,%u,%d", plBuffer[b].id[0], plBuffer[b].id[1], plBuffer[b].id[2], plBuffer[b].id[3], plBuffer[b].temp[0], plBuffer[b].temp[1], plBuffer[b].temp[2], plBuffer[b].temp[3], plBuffer[b].temp[4], plBuffer[b].temp[5],plBuffer[b].humidity,plBuffer[b].bat,local->baseTemp,local->baseHum,local->baseLux);
-        //mqtt.publish("c/d", buf);
+        char buf[120] = "";
+        sprintf(buf, "%s,%i,%u,%d,%u", mqttClient, local->baseTemp, local->baseHum, local->baseLux, local->baseBat);
+        Serial.println(buf);
+        mqtt.publish("c/d", buf);
+        sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, results[0], results[1], results[2], results[3], results[4], results[5], results[6], results[7], results[8]);
+        Serial.println(buf);
+        mqtt.publish("c/s", buf);
       }  
   mqtt.disconnect();
   gprsEnd();
 }
+
 //////////// init gprs, connect and disconnect from network ////////////////////
 void gprsTest() {
   gprsResetModem();
@@ -316,6 +338,10 @@ void gprsTest() {
 }
 
 void gprsResetModem() {
+  digitalWrite(LED_BUILTIN, LOW);
+  //modem.sendAT("+CSCLK=0");
+  //modem.sendAT("+CSCLK=0");
+  //modem.sendAT("+CFUN=1");
   modem.restart();
   String modemInfo = modem.getModemInfo();
   Serial.print(F(" Modem: "));
@@ -346,5 +372,8 @@ void gprsEnd() {
 }
 
 void gprsSleep(){
+  digitalWrite(LED_BUILTIN, HIGH);
+  modem.sendAT("+CFUN=0");
+  modem.sendAT("+CSCLK=2");
   modem.sleepEnable();
 }
