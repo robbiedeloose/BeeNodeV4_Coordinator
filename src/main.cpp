@@ -5,6 +5,7 @@
   #define SLEEPTIMER 1      // how often do we want to send data (in minutes)
   #define STARTDELAY 20      // delay start of programm, needed for reprogamming when using sleep
   #define DEBUG             // comment to use sleep
+  #define DELAY_TIMER 1000  
 ///////////////////////// PIN DEFINES //////////////////////////////////////////
   #define flashChipCSPin 4
   #define buildInLed 13
@@ -78,7 +79,7 @@
   ////////////////////////////////// SCALES ////////////////////////////////////////
     #include "HX711-multi.h"
     byte DOUTS[9] = {scaleData1, scaleData2, scaleData3, scaleData4, scaleData5, scaleData6, scaleData7, scaleData8, scaleData9};
-    #define CHANNEL_COUNT sizeof(DOUTS)/sizeof(byte)
+    #define CHANNEL_COUNT (int)(sizeof(DOUTS)/sizeof(byte))
     long int results[CHANNEL_COUNT];
     HX711MULTI scales(CHANNEL_COUNT, DOUTS, scaleClock);
 
@@ -161,11 +162,11 @@ void loop() {
     // show
     showLocalData(&localData);
     // send
-    mqttSendData(&localData);
+    //mqttSendData(&localData);
     // sleep
     #ifdef DEBUG
       digitalWrite(LED_BUILTIN, LOW);
-      delay(60000);
+      delay(DELAY_TIMER);
     #else
       sleepCoordinator();
     #endif
@@ -257,6 +258,7 @@ void getScaleData(LocalData_t *local, int nbOfReads, int maxDeviation) {
   long int weights[nbOfReads][CHANNEL_COUNT];
   for (int read = 0; read < nbOfReads; read++) {
     scales.read(weights[read]);
+    delay(100);
   }
   for (int channel = 0; channel < CHANNEL_COUNT; channel++) {
     int sum = 0;
