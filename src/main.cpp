@@ -106,7 +106,7 @@
   // Sensors
   void getCoordinatorData(LocalData_t *local);
   void getWeatherData(LocalData_t *local);
-  void getScaleData(LocalData_t *local, int nbOfReads = 10);
+  void getScaleData(LocalData_t *local, int nbOfReads = 10, int maxDeviation = 1000);
   void showLocalData(LocalData_t *local);
   // Communications
   void gprsTest();
@@ -252,7 +252,7 @@ void getWeatherData(LocalData_t *local) {
   local->baseLux = lightMeter.readLightLevel();
 }
 
-void getScaleData(LocalData_t *local, int nbOfReads) {
+void getScaleData(LocalData_t *local, int nbOfReads, int maxDeviation) {
   Serial.println(":: getScaleData");
   long int weights[nbOfReads][CHANNEL_COUNT];
   for (int read = 0; read < nbOfReads; read++) {
@@ -260,8 +260,15 @@ void getScaleData(LocalData_t *local, int nbOfReads) {
   }
   for (int channel = 0; channel < CHANNEL_COUNT; channel++) {
     int sum = 0;
+    float average = 0.0;
     for (int read = 0; read < nbOfReads; read++) {
-      sum += weights[read][channel];
+      int nextValue = weights[read][channel];
+      if (abs(nextValue - average) < maxDeviation) {
+        sum += nextValue;
+      } else {
+        sum += int(floor(average));
+      }
+      average = sum / (read + 1);
     }
     local->weights[channel] = int(floor(sum / nbOfReads));
   }
