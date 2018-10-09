@@ -265,7 +265,7 @@ void getScaleData(LocalData_t *local, int nbOfReads, int maxDeviation) {
     float average = 0.0;
     for (int read = 0; read < nbOfReads; read++) {
       int nextValue = weights[read][channel];
-      if ((read = 0) or (abs(nextValue - average) < maxDeviation)) {
+      if ((read == 0) or (abs(nextValue - average) <= maxDeviation)) {
         sum += nextValue;
       } else {
         sum += int(floor(average));
