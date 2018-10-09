@@ -106,7 +106,7 @@
   // Sensors
   void getCoordinatorData(LocalData_t *local);
   void getWeatherData(LocalData_t *local);
-  void getScaleData(LocalData_t *local);
+  void getScaleData(LocalData_t *local, int nbOfReads = 10);
   void showLocalData(LocalData_t *local);
   // Communications
   void gprsTest();
@@ -257,18 +257,16 @@ void getWeatherData(LocalData_t *local) {
 void getScaleData(LocalData_t *local, int nbOfReads) {
   Serial.println(":: getScaleData");
   long int weights[nbOfReads][CHANNEL_COUNT];
-  for (read = 0, read < nbOfReads, read++) {
+  for (int read = 0; read < nbOfReads; read++) {
     scales.read(weights[read]);
   }
-  double averageWeights[CHANNEL_COUNT];
-  for (channel = 0, channel < CHANNEL_COUNT, channel++) {
+  for (int channel = 0; channel < CHANNEL_COUNT; channel++) {
     int sum = 0;
-    for (read = 0, read < nbOfReads, read++) {
+    for (int read = 0; read < nbOfReads; read++) {
       sum += weights[read][channel];
     }
-    averageWeights[channel] = sum / nbOfReads;
+    local->weights[channel] = int(floor(sum / nbOfReads));
   }
-  local->weights = averageWeights;
 }
 
 void showLocalData(LocalData_t *local) {
@@ -282,17 +280,17 @@ void showLocalData(LocalData_t *local) {
   Serial.print("Bat: ");
   Serial.println(local->baseBat);
   Serial.print("Scale1: ");
-  Serial.println(local->results[0]);
+  Serial.println(local->weights[0]);
   Serial.print("Scale2: ");
-  Serial.println(local->results[1]);
+  Serial.println(local->weights[1]);
   Serial.print("Scale3: ");
-  Serial.println(local->results[2]);
+  Serial.println(local->weights[2]);
   Serial.print("Scale4: ");
-  Serial.println(local->results[3]);
+  Serial.println(local->weights[3]);
   Serial.print("Scale5: ");
-  Serial.println(local->results[4]);
+  Serial.println(local->weights[4]);
   Serial.print("Scale6: ");
-  Serial.println(local->results[5]);
+  Serial.println(local->weights[5]);
 }
 
 /******************************* Communication ********************************/
@@ -333,7 +331,7 @@ void mqttSendData(LocalData_t *local) {
         sprintf(buf, "%s,%i,%u,%d,%u", mqttClient, local->baseTemp, local->baseHum, local->baseLux, local->baseBat);
         Serial.println(buf);
         mqtt.publish("c/d", buf);
-        sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, local->results[0], local->results[1], local->results[2], local->results[3], local->results[4], local->results[5], local->results[6], local->results[7], local->results[8]);
+        sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, local->weights[0], local->weights[1], local->weights[2], local->weights[3], local->weights[4], local->weights[5], local->weights[6], local->weights[7], local->weights[8]);
         Serial.println(buf);
         mqtt.publish("c/s", buf);
       }  
