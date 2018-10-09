@@ -5,7 +5,7 @@
   #define SLEEPTIMER 1      // how often do we want to send data (in minutes)
   #define STARTDELAY 20      // delay start of programm, needed for reprogamming when using sleep
   #define DEBUG             // comment to use sleep
-  #define DELAY_TIMER 1000  
+  #define DELAY_TIMER 2000  
 ///////////////////////// PIN DEFINES //////////////////////////////////////////
   #define flashChipCSPin 4
   #define buildInLed 13
@@ -258,7 +258,7 @@ void getScaleData(LocalData_t *local, int nbOfReads, int maxDeviation) {
   long int weights[nbOfReads][CHANNEL_COUNT];
   for (int read = 0; read < nbOfReads; read++) {
     scales.read(weights[read]);
-    delay(100);
+    delay(250);
   }
   for (int channel = 0; channel < CHANNEL_COUNT; channel++) {
     int sum = 0;
