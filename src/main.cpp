@@ -258,7 +258,7 @@ void getScaleData(LocalData_t *local, int nbOfReads, int maxDeviation) {
   long int weights[nbOfReads][CHANNEL_COUNT];
   for (int read = 0; read < nbOfReads; read++) {
     scales.read(weights[read]);
-    delay(250);
+    delay(500);
   }
   for (int channel = 0; channel < CHANNEL_COUNT; channel++) {
     int sum = 0;
