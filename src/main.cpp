@@ -173,7 +173,7 @@ void loop() {
 }
 
 /******************************* BOARD SPECIFIC *******************************/
-void setPinModes(){
+void setPinModes() {
   pinMode(A5,INPUT);
   //led
   pinMode(LED_BUILTIN, OUTPUT);
@@ -183,7 +183,7 @@ void setPinModes(){
   digitalWrite(gsmResetPin, HIGH);
 }
 
-void readIdFromEepRom(){
+void readIdFromEepRom() {
   //0x50 is the I2c address, 0xF8 is the memory address where the read-only MAC value is
   Wire.beginTransmission(0x50);
   Wire.write(0xF8); // LSB 
@@ -198,12 +198,12 @@ void readIdFromEepRom(){
   
 }
 
-void initFlash(){
-    SerialFlash.begin(flashChipSelect);
-    SerialFlash.sleep(); 
+void initFlash() {
+  SerialFlash.begin(flashChipSelect);
+  SerialFlash.sleep(); 
 }
 
-void displayCoordinatorData(){
+void displayCoordinatorData() {
   Serial.println(F("BeeNode v4.0.1a"));
   char buf[17] = "";
   sprintf(buf, "%02X%02X%02X%02X%02X%02X%02X%02X", coordinatorAddress[0], coordinatorAddress[1], coordinatorAddress[2], coordinatorAddress[3], coordinatorAddress[4], coordinatorAddress[5], coordinatorAddress[6], coordinatorAddress[7]);
@@ -211,11 +211,9 @@ void displayCoordinatorData(){
   Serial.println(buf);
 } 
 
-void delayStartup(){
+void delayStartup() {
    /***** IMPORTANT DELAY FOR CODE UPLOAD BEFORE USB PORT DETACH DURING SLEEP *****/
-
-  for(uint8_t i = 0; i < (STARTDELAY*2)+1; i++)
-  {
+  for(uint8_t i = 0; i < (STARTDELAY*2)+1; i++) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
     Serial.print(".");
     delay(500);
@@ -224,24 +222,24 @@ void delayStartup(){
 }
 
 /******************************* RTC + SLEEP **********************************/
-void setRtcAlarm(uint8_t alarmMinutes){
-    Serial.println(":: setRtcAlarm");
-    rtc.setAlarmSeconds(0);
-    rtc.setAlarmMinutes((rtc.getMinutes()+alarmMinutes)%60);
-    rtc.enableAlarm(rtc.MATCH_MMSS);
-    rtc.attachInterrupt(alarmMatch);
+void setRtcAlarm(uint8_t alarmMinutes) {
+  Serial.println(":: setRtcAlarm");
+  rtc.setAlarmSeconds(0);
+  rtc.setAlarmMinutes((rtc.getMinutes()+alarmMinutes)%60);
+  rtc.enableAlarm(rtc.MATCH_MMSS);
+  rtc.attachInterrupt(alarmMatch);
 }
 
-void sleepCoordinator(){
-    Serial.println(F("sleep"));
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(500); // give serial time to complete before node goes to sleep
+void sleepCoordinator() {
+  Serial.println(F("sleep"));
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500); // give serial time to complete before node goes to sleep
 }
 
-void alarmMatch(){}
+void alarmMatch() {}
 
 /******************************* sensors **************************************/
-void getCoordinatorData(LocalData_t *local){
+void getCoordinatorData(LocalData_t *local) {
   Serial.println(":: getCoordinatorData");
   // voltage / id
   local->baseBat = analogRead(A5)*4.3;
@@ -295,11 +293,10 @@ void showLocalData(LocalData_t *local) {
 
 /******************************* Communication ********************************/
 //////////// MQTT Code /////////////////////////////////////////////////////////
-void mqttInit(){
+void mqttInit() {
   Serial.println(":: mqttInit");
   mqtt.setServer(broker, mqttPort);
-  for(size_t i = 0; i < 17; i++)
-  {
+  for(size_t i = 0; i < 17; i++) {
     mqttClient[i]=coordinatorAddressString[i];
   }
   mqttClient[16] = '\0';
@@ -326,15 +323,15 @@ void mqttSendData(LocalData_t *local) {
   Serial.println(":: mqttSendData");
   gprsResetModem();
   gprsConnectNetwork();
-      if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
-        char buf[120] = "";
-        sprintf(buf, "%s,%i,%u,%d,%u", mqttClient, local->baseTemp, local->baseHum, local->baseLux, local->baseBat);
-        Serial.println(buf);
-        mqtt.publish("c/d", buf);
-        sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, local->weights[0], local->weights[1], local->weights[2], local->weights[3], local->weights[4], local->weights[5], local->weights[6], local->weights[7], local->weights[8]);
-        Serial.println(buf);
-        mqtt.publish("c/s", buf);
-      }  
+  if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
+    char buf[120] = "";
+    sprintf(buf, "%s,%i,%u,%d,%u", mqttClient, local->baseTemp, local->baseHum, local->baseLux, local->baseBat);
+    Serial.println(buf);
+    mqtt.publish("c/d", buf);
+    sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, local->weights[0], local->weights[1], local->weights[2], local->weights[3], local->weights[4], local->weights[5], local->weights[6], local->weights[7], local->weights[8]);
+    Serial.println(buf);
+    mqtt.publish("c/s", buf);
+  }  
   mqtt.disconnect();
   gprsEnd();
   delay(250);
@@ -382,7 +379,7 @@ void gprsEnd() {
   Serial.println(" Disconnected");
 }
 
-void gprsSleep(){
+void gprsSleep() {
   Serial.println(":: gprsSleep");
   modem.poweroff();
 }
