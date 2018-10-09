@@ -89,8 +89,7 @@
     uint16_t baseHum;
     uint16_t baseLux;
     uint16_t baseBat;
-    //char scales[2][23];
-    long int results[CHANNEL_COUNT];
+    long int weights[CHANNEL_COUNT];
   };
 
 /******************************* FUNCTION DECLARATIONS ************************/
@@ -255,12 +254,24 @@ void getWeatherData(LocalData_t *local) {
   local->baseLux = lightMeter.readLightLevel();
 }
 
-void getScaleData(LocalData_t *local) {
+void getScaleData(LocalData_t *local, int nbOfReads) {
   Serial.println(":: getScaleData");
-  scales.read(local->results);
+  long int weights[nbOfReads][CHANNEL_COUNT];
+  for (read = 0, read < nbOfReads, read++) {
+    scales.read(weights[read]);
+  }
+  double averageWeights[CHANNEL_COUNT];
+  for (channel = 0, channel < CHANNEL_COUNT, channel++) {
+    int sum = 0;
+    for (read = 0, read < nbOfReads, read++) {
+      sum += weights[read][channel];
+    }
+    averageWeights[channel] = sum / nbOfReads;
+  }
+  local->weights = averageWeights;
 }
 
-void showLocalData(LocalData_t *local){
+void showLocalData(LocalData_t *local) {
   Serial.println(":: showLocalData");
   Serial.print("Temperature: ");
   Serial.println(local->baseTemp);
