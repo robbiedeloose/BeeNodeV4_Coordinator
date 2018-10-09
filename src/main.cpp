@@ -20,8 +20,8 @@
   #define scaleData8 9
   #define scaleData9 10
 
-  #define dtrPin 11
-  #define reset
+  //#define dtrPin 11
+  #define gsmResetPin 11
 
 ///////////////////////// General Stuff ////////////////////////////////////////
   #include <Arduino.h>
@@ -89,7 +89,8 @@
     uint16_t baseHum;
     uint16_t baseLux;
     uint16_t baseBat;
-    char scales[2][23];
+    //char scales[2][23];
+    long int results[CHANNEL_COUNT];
   };
 
 /******************************* FUNCTION DECLARATIONS ************************/
@@ -179,9 +180,8 @@ void setPinModes(){
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   //gprssleep
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-
+  pinMode(gsmResetPin, OUTPUT);
+  digitalWrite(gsmResetPin, HIGH);
 }
 
 void readIdFromEepRom(){
@@ -257,7 +257,7 @@ void getWeatherData(LocalData_t *local) {
 
 void getScaleData(LocalData_t *local) {
   Serial.println(":: getScaleData");
-    scales.read(results);
+  scales.read(local->results);
 }
 
 void showLocalData(LocalData_t *local){
@@ -271,17 +271,17 @@ void showLocalData(LocalData_t *local){
   Serial.print("Bat: ");
   Serial.println(local->baseBat);
   Serial.print("Scale1: ");
-  Serial.println(results[0]);
+  Serial.println(local->results[0]);
   Serial.print("Scale2: ");
-  Serial.println(results[1]);
+  Serial.println(local->results[1]);
   Serial.print("Scale3: ");
-  Serial.println(results[2]);
+  Serial.println(local->results[2]);
   Serial.print("Scale4: ");
-  Serial.println(results[3]);
+  Serial.println(local->results[3]);
   Serial.print("Scale5: ");
-  Serial.println(results[4]);
+  Serial.println(local->results[4]);
   Serial.print("Scale6: ");
-  Serial.println(results[5]);
+  Serial.println(local->results[5]);
 }
 
 /******************************* Communication ********************************/
@@ -322,12 +322,14 @@ void mqttSendData(LocalData_t *local) {
         sprintf(buf, "%s,%i,%u,%d,%u", mqttClient, local->baseTemp, local->baseHum, local->baseLux, local->baseBat);
         Serial.println(buf);
         mqtt.publish("c/d", buf);
-        sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, results[0], results[1], results[2], results[3], results[4], results[5], results[6], results[7], results[8]);
+        sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, local->results[0], local->results[1], local->results[2], local->results[3], local->results[4], local->results[5], local->results[6], local->results[7], local->results[8]);
         Serial.println(buf);
         mqtt.publish("c/s", buf);
       }  
   mqtt.disconnect();
   gprsEnd();
+  delay(250);
+  gprsSleep();
 }
 
 //////////// init gprs, connect and disconnect from network ////////////////////
@@ -338,11 +340,11 @@ void gprsTest() {
 }
 
 void gprsResetModem() {
-  digitalWrite(LED_BUILTIN, LOW);
-  //modem.sendAT("+CSCLK=0");
-  //modem.sendAT("+CSCLK=0");
-  //modem.sendAT("+CFUN=1");
-  modem.restart();
+  Serial.println(":: gprsResetModem");
+  digitalWrite(gsmResetPin, LOW);
+  digitalWrite(gsmResetPin, HIGH);
+  delay(100);
+  //modem.restart();
   String modemInfo = modem.getModemInfo();
   Serial.print(F(" Modem: "));
   Serial.println(modemInfo);
@@ -372,8 +374,6 @@ void gprsEnd() {
 }
 
 void gprsSleep(){
-  digitalWrite(LED_BUILTIN, HIGH);
-  modem.sendAT("+CFUN=0");
-  modem.sendAT("+CSCLK=2");
-  modem.sleepEnable();
+  Serial.println(":: gprsSleep");
+  modem.poweroff();
 }
