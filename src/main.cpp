@@ -25,8 +25,7 @@
   #define SCALE_6_DATA 12  // blauw
   */
 
-  //#define dtrPin 11
-  #define gsmResetPin 11
+  #define gsmResetPin 6
 
 ///////////////////////// General Stuff ////////////////////////////////////////
   #include <Arduino.h>
@@ -256,31 +255,17 @@ void getCoordinatorData(LocalData_t *local) {
 
 void getWeatherData(LocalData_t *local) {
   Serial.println(":: getWeatherData");
-  Serial.println("temp");
   local->baseTemp = myHumidity.readTemperature() * 100;
-  Serial.println("hum");
   local->baseHum = myHumidity.readHumidity() * 100;
-  Serial.println("light");
   local->baseLux = lightMeter.readLightLevel();
-  Serial.println("done");
 }
 
 void getScaleData(LocalData_t *local) {
   Serial.println(":: getScaleData");
   delay(1000);
-  Serial.println("read scale 1");
   local->weights[0] = scale1.get_value(10);
-  //Serial.print(local->weights[0]);
-  //Serial.print("\t");
-  Serial.println("read scale 2");
   local->weights[1] = scale2.get_value(10);
-  //Serial.print(local->weights[1]);
-  //Serial.print("\t");
-  Serial.println("read scale 3");
   local->weights[2] = scale3.get_value(10);
-  //Serial.print(local->weights[2]);
-  //Serial.println();
-  Serial.println("done");
 }
 
 void showLocalData(LocalData_t *local) {
