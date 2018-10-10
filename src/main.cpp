@@ -10,16 +10,20 @@
   #define flashChipCSPin 4
   #define buildInLed 13
 
-  #define scaleClock 15
-  #define scaleData1 5
-  #define scaleData2 6
-  #define scaleData3 7
-  #define scaleData4 16
-  #define scaleData5 17
-  #define scaleData6 18
-  #define scaleData7 8
-  #define scaleData8 9
-  #define scaleData9 10
+  #define SCALE_1_CLOCK 7  // wit-blauw
+  #define SCALE_1_DATA 8   // blauw
+  #define SCALE_2_CLOCK 9  // wit-groen
+  #define SCALE_2_DATA 10   // groen
+  #define SCALE_3_CLOCK 11  // wit-bruin
+  #define SCALE_3_DATA 12   // bruin
+  /*
+  #define SCALE_4_CLOCK 9  // geel
+  #define SCALE_4_DATA 8   // blauw
+  #define SCALE_5_CLOCK 11 // geel
+  #define SCALE_5_DATA 10  // blauw
+  #define SCALE_6_CLOCK 13 // geel
+  #define SCALE_6_DATA 12  // blauw
+  */
 
   //#define dtrPin 11
   #define gsmResetPin 11
@@ -78,22 +82,6 @@
 
   ////////////////////////////////// SCALES ////////////////////////////////////////
   #include "HX711.h"
-
-  #define SCALE_1_CLOCK 7  // wit-blauw
-  #define SCALE_1_DATA 8   // blauw
-  #define SCALE_2_CLOCK 9  // wit-groen
-  #define SCALE_2_DATA 10   // groen
-  #define SCALE_3_CLOCK 11  // wit-bruin
-  #define SCALE_3_DATA 12   // bruin
-
-  /*
-  #define SCALE_4_CLOCK 9  // geel
-  #define SCALE_4_DATA 8   // blauw
-  #define SCALE_5_CLOCK 11 // geel
-  #define SCALE_5_DATA 10  // blauw
-  #define SCALE_6_CLOCK 13 // geel
-  #define SCALE_6_DATA 12  // blauw
-  */
 
   // DT, SCK  // parameter "gain" is ommited; the default value 128 is used by the library
   HX711 scale1(SCALE_1_DATA, SCALE_1_CLOCK); 
@@ -156,11 +144,10 @@ void setup() {
   initFlash();
   // Get id
   readIdFromEepRom();
-    // Delay startup to allow programming
+  // Delay startup to allow programming
   delayStartup();
   // Display information to serial
   displayCoordinatorData();  
-
   // init communications
   mqttInit();
   // Init sensors
@@ -275,20 +262,25 @@ void getWeatherData(LocalData_t *local) {
   local->baseHum = myHumidity.readHumidity() * 100;
   Serial.println("light");
   local->baseLux = lightMeter.readLightLevel();
+  Serial.println("done");
 }
 
 void getScaleData(LocalData_t *local) {
   Serial.println(":: getScaleData");
   delay(1000);
-  /*local->weights[0] = scale1.get_value(10);
-  Serial.print(local->weights[0]);
-  Serial.print("\t");
+  Serial.println("read scale 1");
+  local->weights[0] = scale1.get_value(10);
+  //Serial.print(local->weights[0]);
+  //Serial.print("\t");
+  Serial.println("read scale 2");
   local->weights[1] = scale2.get_value(10);
-  Serial.print(local->weights[1]);
-  Serial.print("\t");
+  //Serial.print(local->weights[1]);
+  //Serial.print("\t");
+  Serial.println("read scale 3");
   local->weights[2] = scale3.get_value(10);
-  Serial.print(local->weights[2]);
-  Serial.println();*/
+  //Serial.print(local->weights[2]);
+  //Serial.println();
+  Serial.println("done");
 }
 
 void showLocalData(LocalData_t *local) {
