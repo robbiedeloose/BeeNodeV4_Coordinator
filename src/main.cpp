@@ -280,7 +280,7 @@ void getWeatherData(LocalData_t *local) {
 void getScaleData(LocalData_t *local) {
   Serial.println(":: getScaleData");
   delay(1000);
-  local->weights[0] = scale1.get_value(10);
+  /*local->weights[0] = scale1.get_value(10);
   Serial.print(local->weights[0]);
   Serial.print("\t");
   local->weights[1] = scale2.get_value(10);
@@ -288,7 +288,7 @@ void getScaleData(LocalData_t *local) {
   Serial.print("\t");
   local->weights[2] = scale3.get_value(10);
   Serial.print(local->weights[2]);
-  Serial.println();
+  Serial.println();*/
 }
 
 void showLocalData(LocalData_t *local) {

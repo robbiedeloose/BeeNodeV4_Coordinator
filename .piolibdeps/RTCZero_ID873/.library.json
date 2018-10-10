@@ -1,0 +1,39 @@
+{
+    "description": "Allows to use the RTC functionalities. For Arduino Zero, MKRZero and MKR1000 only.", 
+    "repository": {
+        "url": "https://github.com/arduino-libraries/RTCZero", 
+        "type": "git"
+    }, 
+    "platforms": [
+        "atmelsam"
+    ], 
+    "export": {
+        "exclude": [
+            "extras", 
+            "docs", 
+            "tests", 
+            "test", 
+            "*.doxyfile", 
+            "*.pdf"
+        ], 
+        "include": null
+    }, 
+    "authors": [
+        {
+            "maintainer": true, 
+            "name": "Arduino", 
+            "url": null, 
+            "email": "info@arduino.cc"
+        }
+    ], 
+    "keywords": [
+        "timing"
+    ], 
+    "id": 873, 
+    "name": "RTCZero", 
+    "frameworks": [
+        "arduino"
+    ], 
+    "version": "1.5.2", 
+    "homepage": "http://www.arduino.cc/en/Reference/RTC"
+}
