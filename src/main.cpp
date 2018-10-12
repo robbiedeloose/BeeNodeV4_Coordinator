@@ -16,16 +16,15 @@
   #define SCALE_2_DATA 10   // groen
   #define SCALE_3_CLOCK 11  // wit-bruin
   #define SCALE_3_DATA 12   // bruin
-  /*
-  #define SCALE_4_CLOCK 9  // geel
-  #define SCALE_4_DATA 8   // blauw
-  #define SCALE_5_CLOCK 11 // geel
-  #define SCALE_5_DATA 10  // blauw
-  #define SCALE_6_CLOCK 13 // geel
-  #define SCALE_6_DATA 12  // blauw
-  */
+  
+  #define SCALE_4_CLOCK 0  // geel
+  #define SCALE_4_DATA 1   // blauw
+  #define SCALE_5_CLOCK A1 // geel
+  #define SCALE_5_DATA A2  // blauw
+  #define SCALE_6_CLOCK A3 // geel
+  #define SCALE_6_DATA A4  // blauw
 
-  #define gsmResetPin 6
+  #define gsmResetPin 38
 
 ///////////////////////// General Stuff ////////////////////////////////////////
   #include <Arduino.h>
@@ -33,8 +32,9 @@
   #include <SPI.h>
 
 /******************************* BOARD FUNCTIONS ******************************/
-  #define Serial SerialUSB
-  ////////////////////////////////// SERIAL FLASH ////////////////////////////////
+  #define SerialMon SerialUSB
+  #define SerialAT Serial
+  ////////////////////////////////// SerialMon FLASH ////////////////////////////////
   #include <SerialFlash.h>
   const int flashChipSelect = flashChipCSPin;
   ////////////////////////////////// RTC + SLEEP /////////////////////////////////
@@ -66,7 +66,7 @@
   const char *mqttUser = "oseiokpx";
   const char *mqttPswd = "31IMHCdWxVVt";
 
-  TinyGsm modem(Serial1);
+  TinyGsm modem(SerialAT);
   TinyGsmClient client(modem);
   PubSubClient mqtt(client);
   char mqttClient[17] = "";
@@ -86,9 +86,9 @@
   HX711 scale1(SCALE_1_DATA, SCALE_1_CLOCK); 
   HX711 scale2(SCALE_2_DATA, SCALE_2_CLOCK); 
   HX711 scale3(SCALE_3_DATA, SCALE_3_CLOCK);
-  //HX711 scale4(SCALE_4_DATA, SCALE_4_CLOCK); 
-  //HX711 scale5(SCALE_5_DATA, SCALE_5_CLOCK); 
-  //HX711 scale6(SCALE_6_DATA, SCALE_6_CLOCK); 
+  HX711 scale4(SCALE_4_DATA, SCALE_4_CLOCK); 
+  HX711 scale5(SCALE_5_DATA, SCALE_5_CLOCK); 
+  HX711 scale6(SCALE_6_DATA, SCALE_6_CLOCK); 
 
 
 /******************************* STRUCTS **************************************/
@@ -98,7 +98,7 @@
     uint16_t baseHum;
     uint16_t baseLux;
     uint16_t baseBat;
-    long int weights[3];
+    long int weights[6];
   };
 
 /******************************* FUNCTION DECLARATIONS ************************/
@@ -136,16 +136,16 @@ void setup() {
   setPinModes();
   // start serials and Wire
   Wire.begin();
-  Serial.begin(115200);
-  Serial1.begin(115200);
+  SerialMon.begin(115200);
+  SerialAT.begin(115200);
   delay(3000);
-  // Init serial flash
+  // Init SerialMon flash
   initFlash();
   // Get id
   readIdFromEepRom();
   // Delay startup to allow programming
   delayStartup();
-  // Display information to serial
+  // Display information to SerialMon
   displayCoordinatorData();  
   // init communications
   mqttInit();
@@ -156,7 +156,7 @@ void setup() {
 
 /////////////// LOOP ///////////////////////////////////////////////////////////
 void loop() {
-    Serial.println(":: Loop");
+    SerialMon.println(":: Loop");
     digitalWrite(LED_BUILTIN, HIGH);
     LocalData_t localData;
 
@@ -212,26 +212,26 @@ void initFlash() {
 }
 
 void displayCoordinatorData() {
-  Serial.println(F("BeeNode v4.0.1a"));
+  SerialMon.println(F("BeeNode v4.0.1a"));
   char buf[17] = "";
   sprintf(buf, "%02X%02X%02X%02X%02X%02X%02X%02X", coordinatorAddress[0], coordinatorAddress[1], coordinatorAddress[2], coordinatorAddress[3], coordinatorAddress[4], coordinatorAddress[5], coordinatorAddress[6], coordinatorAddress[7]);
-  Serial.print("Id: ");
-  Serial.println(buf);
+  SerialMon.print("Id: ");
+  SerialMon.println(buf);
 } 
 
 void delayStartup() {
    /***** IMPORTANT DELAY FOR CODE UPLOAD BEFORE USB PORT DETACH DURING SLEEP *****/
   for(uint8_t i = 0; i < (STARTDELAY*2)+1; i++) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    Serial.print(".");
+    SerialMon.print(".");
     delay(500);
   }
-  Serial.println();
+  SerialMon.println();
 }
 
 /******************************* RTC + SLEEP **********************************/
 void setRtcAlarm(uint8_t alarmMinutes) {
-  Serial.println(":: setRtcAlarm");
+  SerialMon.println(":: setRtcAlarm");
   rtc.setAlarmSeconds(0);
   rtc.setAlarmMinutes((rtc.getMinutes()+alarmMinutes)%60);
   rtc.enableAlarm(rtc.MATCH_MMSS);
@@ -239,76 +239,86 @@ void setRtcAlarm(uint8_t alarmMinutes) {
 }
 
 void sleepCoordinator() {
-  Serial.println(F("sleep"));
+  SerialMon.println(F("sleep"));
   digitalWrite(LED_BUILTIN, LOW);
-  delay(500); // give serial time to complete before node goes to sleep
+  delay(500); // give SerialMon time to complete before node goes to sleep
 }
 
 void alarmMatch() {}
 
 /******************************* sensors **************************************/
 void getCoordinatorData(LocalData_t *local) {
-  Serial.println(":: getCoordinatorData");
+  SerialMon.println(":: getCoordinatorData");
   // voltage / id
   local->baseBat = analogRead(A5)*4.3;
 }
 
 void getWeatherData(LocalData_t *local) {
-  Serial.println(":: getWeatherData");
+  SerialMon.println(":: getWeatherData");
   local->baseTemp = myHumidity.readTemperature() * 100;
   local->baseHum = myHumidity.readHumidity() * 100;
   local->baseLux = lightMeter.readLightLevel();
 }
 
 void getScaleData(LocalData_t *local) {
-  Serial.println(":: getScaleData");
+  SerialMon.println(":: getScaleData");
   delay(1000);
+  SerialMon.println("scale1");
   local->weights[0] = scale1.get_value(10);
+  SerialMon.println("scale2");
   local->weights[1] = scale2.get_value(10);
+  SerialMon.println("scale3");
   local->weights[2] = scale3.get_value(10);
+  SerialMon.println("scale4");
+  local->weights[3] = scale4.get_value(10);
+  SerialMon.println("scale5");
+  local->weights[4] = scale5.get_value(10);
+  SerialMon.println("scale6");
+  local->weights[5] = scale6.get_value(10);
+  SerialMon.println("done");
 }
 
 void showLocalData(LocalData_t *local) {
-  Serial.println(":: showLocalData");
-  Serial.print("Temperature: ");
-  Serial.println(local->baseTemp);
-  Serial.print("Humidity: ");
-  Serial.println(local->baseHum);
-  Serial.print("Lux: ");
-  Serial.println(local->baseLux);
-  Serial.print("Bat: ");
-  Serial.println(local->baseBat);
-  Serial.print("Scale1: ");
-  Serial.println(local->weights[0]);
-  Serial.print("Scale2: ");
-  Serial.println(local->weights[1]);
-  Serial.print("Scale3: ");
-  Serial.println(local->weights[2]);
-  //Serial.print("Scale4: ");
-  //Serial.println(local->weights[3]);
-  //Serial.print("Scale5: ");
-  //Serial.println(local->weights[4]);
-  //Serial.print("Scale6: ");
-  //Serial.println(local->weights[5]);
+  SerialMon.println(":: showLocalData");
+  SerialMon.print("Temperature: ");
+  SerialMon.println(local->baseTemp);
+  SerialMon.print("Humidity: ");
+  SerialMon.println(local->baseHum);
+  SerialMon.print("Lux: ");
+  SerialMon.println(local->baseLux);
+  SerialMon.print("Bat: ");
+  SerialMon.println(local->baseBat);
+  SerialMon.print("Scale1: ");
+  SerialMon.println(local->weights[0]);
+  SerialMon.print("Scale2: ");
+  SerialMon.println(local->weights[1]);
+  SerialMon.print("Scale3: ");
+  SerialMon.println(local->weights[2]);
+  SerialMon.print("Scale4: ");
+  SerialMon.println(local->weights[3]);
+  SerialMon.print("Scale5: ");
+  SerialMon.println(local->weights[4]);
+  SerialMon.print("Scale6: ");
+  SerialMon.println(local->weights[5]);
 }
 
 /******************************* Communication ********************************/
 //////////// MQTT Code /////////////////////////////////////////////////////////
 void mqttInit() {
-  Serial.println(":: mqttInit");
+  SerialMon.println(":: mqttInit");
   mqtt.setServer(broker, mqttPort);
   for(size_t i = 0; i < 17; i++) {
     mqttClient[i]=coordinatorAddressString[i];
   }
   mqttClient[16] = '\0';
   //mqtt.setCallback(mqttCallback);
-  Serial.print("Mqtt Client ID: ");
-  Serial.println(mqttClient);
+  SerialMon.print("Mqtt Client ID: ");
+  SerialMon.println(mqttClient);
   mqttRegister();
 }
 
 void mqttRegister() {
-  Serial.println(":: mqttRegsister");
+  SerialMon.println(":: mqttRegsister");
   gprsResetModem();
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
@@ -316,21 +326,21 @@ void mqttRegister() {
   }
   mqtt.disconnect();
   gprsEnd();
-  Serial.println("Registered CO");
+  SerialMon.println("Registered CO");
   //gprsSleep();
 }
 
 void mqttSendData(LocalData_t *local) {
-  Serial.println(":: mqttSendData");
+  SerialMon.println(":: mqttSendData");
   gprsResetModem();
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
     char buf[120] = "";
     sprintf(buf, "%s,%i,%u,%d,%u", mqttClient, local->baseTemp, local->baseHum, local->baseLux, local->baseBat);
-    Serial.println(buf);
+    SerialMon.println(buf);
     mqtt.publish("c/d", buf);
     sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, local->weights[0], local->weights[1], local->weights[2], local->weights[3], local->weights[4], local->weights[5], local->weights[6], local->weights[7], local->weights[8]);
-    Serial.println(buf);
+    SerialMon.println(buf);
     mqtt.publish("c/s", buf);
   }  
   mqtt.disconnect();
@@ -347,40 +357,40 @@ void gprsTest() {
 }
 
 void gprsResetModem() {
-  Serial.println(":: gprsResetModem");
+  SerialMon.println(":: gprsResetModem");
   digitalWrite(gsmResetPin, LOW);
   digitalWrite(gsmResetPin, HIGH);
   delay(100);
   //modem.restart();
   String modemInfo = modem.getModemInfo();
-  Serial.print(F(" Modem: "));
-  Serial.println(modemInfo);
+  SerialMon.print(F(" Modem: "));
+  SerialMon.println(modemInfo);
 }
 
 void gprsConnectNetwork() {
-  Serial.print(F(" Waiting for network..."));
+  SerialMon.print(F(" Waiting for network..."));
   if (!modem.waitForNetwork()) {
-    Serial.println(F(" fail"));
+    SerialMon.println(F(" fail"));
     delay(10000);
     return;
   }
-  Serial.println(F(" OK"));
-  Serial.print(F(" Connecting to "));
-  Serial.print(apn);
+  SerialMon.println(F(" OK"));
+  SerialMon.print(F(" Connecting to "));
+  SerialMon.print(apn);
   if (!modem.gprsConnect(apn, user, pass)) {
-    Serial.println(F(" fail"));
+    SerialMon.println(F(" fail"));
     delay(10000);
     return;
   }
-  Serial.println(F(" OK"));
+  SerialMon.println(F(" OK"));
 }
 
 void gprsEnd() {
   modem.gprsDisconnect();
-  Serial.println(" Disconnected");
+  SerialMon.println(" Disconnected");
 }
 
 void gprsSleep() {
-  Serial.println(":: gprsSleep");
+  SerialMon.println(":: gprsSleep");
   modem.poweroff();
 }
