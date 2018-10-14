@@ -5,7 +5,7 @@
   #define SLEEPTIMER 1      // how often do we want to send data (in minutes)
   #define STARTDELAY 20      // delay start of programm, needed for reprogamming when using sleep
   #define DEBUG             // comment to use sleep
-  #define DELAY_TIMER 2000  
+  #define DELAY_TIMER 10000  
 ///////////////////////// PIN DEFINES //////////////////////////////////////////
   #define flashChipCSPin 4
   #define buildInLed 13
@@ -24,7 +24,7 @@
   #define SCALE_6_CLOCK A3 // geel
   #define SCALE_6_DATA A4  // blauw
 
-  #define GSM_RESET_PIN 38
+  #define GSM_RESET_PIN 2
 
 ///////////////////////// General Stuff ////////////////////////////////////////
   #include <Arduino.h>
@@ -148,10 +148,13 @@ void setup() {
   // Display information to SerialMon
   displayCoordinatorData();  
   // init communications
+  gprsPower(1);
   mqttInit();
+  gprsPower(0);
   // Init sensors
   myHumidity.begin();
   lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
+  delay(2000); // let all initialisations run out
 }
 
 /////////////// LOOP ///////////////////////////////////////////////////////////
@@ -165,12 +168,13 @@ void loop() {
     // collect
     getCoordinatorData(&localData);
     getWeatherData(&localData);
+    gprsPower(1);
     getScaleData(&localData);
     // show
     showLocalData(&localData);
     // send
-    gprsPower(1);
-    //mqttSendData(&localData);
+   
+    mqttSendData(&localData);
     gprsPower(0);
     // sleep
     #ifdef DEBUG
@@ -265,19 +269,19 @@ void getWeatherData(LocalData_t *local) {
 void getScaleData(LocalData_t *local) {
   SerialMon.println(":: getScaleData");
   delay(1000);
-  SerialMon.println("scale1");
+  //SerialMon.println("scale1");
   local->weights[0] = scale1.get_value(10);
-  SerialMon.println("scale2");
+  S//erialMon.println("scale2");
   local->weights[1] = scale2.get_value(10);
-  SerialMon.println("scale3");
+  //SerialMon.println("scale3");
   local->weights[2] = scale3.get_value(10);
-  SerialMon.println("scale4");
+  //SerialMon.println("scale4");
   local->weights[3] = scale4.get_value(10);
-  SerialMon.println("scale5");
+  //SerialMon.println("scale5");
   local->weights[4] = scale5.get_value(10);
-  SerialMon.println("scale6");
+  //SerialMon.println("scale6");
   local->weights[5] = scale6.get_value(10);
-  SerialMon.println("done");
+  //SerialMon.println("done");
 }
 
 void showLocalData(LocalData_t *local) {
@@ -359,9 +363,6 @@ void gprsTest() {
 
 void gprsResetModem() {
   SerialMon.println(":: gprsResetModem");
-  digitalWrite(GSM_RESET_PIN, LOW);
-  digitalWrite(GSM_RESET_PIN, HIGH);
-  delay(100);
   //modem.restart();
   String modemInfo = modem.getModemInfo();
   SerialMon.print(F(" Modem: "));
@@ -388,6 +389,7 @@ void gprsConnectNetwork() {
 
 void gprsEnd() {
   modem.gprsDisconnect();
+  //gprsPower(0);
   SerialMon.println(" Disconnected");
 }
 
@@ -401,8 +403,10 @@ void gprsPower(uint8_t powerState) {
     delay(1500); // should replace this with a 1,5s sleep
     digitalWrite(GSM_RESET_PIN, HIGH);
   }
-  else if (powerState ){
+  else if (powerState == 0 ){
     SerialMon.println(" powerdown");
-    modem.poweroff();
+     digitalWrite(GSM_RESET_PIN, LOW);
+    delay(1500); // should replace this with a 1,5s sleep
+    digitalWrite(GSM_RESET_PIN, HIGH);
   }
 }
