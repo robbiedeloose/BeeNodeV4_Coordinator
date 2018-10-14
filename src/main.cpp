@@ -10,7 +10,7 @@
   #define flashChipCSPin 4
   #define buildInLed 13
 
-  #define SCALE_1_CLOCK 7  // wit-blauw
+  #define SCALE_1_CLOCK 7  // wit-blauw 
   #define SCALE_1_DATA 8   // blauw
   #define SCALE_2_CLOCK 9  // wit-groen
   #define SCALE_2_DATA 10   // groen
@@ -24,7 +24,7 @@
   #define SCALE_6_CLOCK A3 // geel
   #define SCALE_6_DATA A4  // blauw
 
-  #define gsmResetPin 38
+  #define GSM_RESET_PIN 38
 
 ///////////////////////// General Stuff ////////////////////////////////////////
   #include <Arduino.h>
@@ -122,7 +122,7 @@
   void gprsResetModem();
   void gprsConnectNetwork();
   void gprsEnd();
-  void gprsSleep();
+  void gprsPower(uint8_t powerState);
   // MQTT
   void mqttInit();
   void mqttRegister();
@@ -169,7 +169,9 @@ void loop() {
     // show
     showLocalData(&localData);
     // send
+    gprsPower(1);
     //mqttSendData(&localData);
+    gprsPower(0);
     // sleep
     #ifdef DEBUG
       digitalWrite(LED_BUILTIN, LOW);
@@ -187,8 +189,8 @@ void setPinModes() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   //gprssleep
-  pinMode(gsmResetPin, OUTPUT);
-  digitalWrite(gsmResetPin, HIGH);
+  pinMode(GSM_RESET_PIN, OUTPUT);
+  digitalWrite(GSM_RESET_PIN, HIGH);
 }
 
 void readIdFromEepRom() {
@@ -346,7 +348,6 @@ void mqttSendData(LocalData_t *local) {
   mqtt.disconnect();
   gprsEnd();
   delay(250);
-  gprsSleep();
 }
 
 //////////// init gprs, connect and disconnect from network ////////////////////
@@ -358,8 +359,8 @@ void gprsTest() {
 
 void gprsResetModem() {
   SerialMon.println(":: gprsResetModem");
-  digitalWrite(gsmResetPin, LOW);
-  digitalWrite(gsmResetPin, HIGH);
+  digitalWrite(GSM_RESET_PIN, LOW);
+  digitalWrite(GSM_RESET_PIN, HIGH);
   delay(100);
   //modem.restart();
   String modemInfo = modem.getModemInfo();
@@ -390,7 +391,18 @@ void gprsEnd() {
   SerialMon.println(" Disconnected");
 }
 
-void gprsSleep() {
-  SerialMon.println(":: gprsSleep");
-  modem.poweroff();
+
+void gprsPower(uint8_t powerState) {
+  SerialMon.println(":: gprsPower");
+  if (powerState == 1){
+    SerialMon.println(" powerup");
+    // pull powerbutton low for 1,5 sec
+    digitalWrite(GSM_RESET_PIN, LOW);
+    delay(1500); // should replace this with a 1,5s sleep
+    digitalWrite(GSM_RESET_PIN, HIGH);
+  }
+  else if (powerState ){
+    SerialMon.println(" powerdown");
+    modem.poweroff();
+  }
 }
