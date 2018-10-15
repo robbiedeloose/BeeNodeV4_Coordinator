@@ -70,6 +70,7 @@
   TinyGsmClient client(modem);
   PubSubClient mqtt(client);
   char mqttClient[17] = "";
+  uint8_t powerState = 0;
 
 /******************************* Sensors **************************************/
   //////////////////////////////// HUMIDITY //////////////////////////////////////
@@ -122,7 +123,8 @@
   void gprsResetModem();
   void gprsConnectNetwork();
   void gprsEnd();
-  void gprsPower(uint8_t powerState);
+  void gprsPowerOn();
+  void gprsPowerOff();  
   // MQTT
   void mqttInit();
   void mqttRegister();
@@ -148,9 +150,10 @@ void setup() {
   // Display information to SerialMon
   displayCoordinatorData();  
   // init communications
-  gprsPower(1);
+  gprsPowerOn();
   mqttInit();
-  gprsPower(0);
+  mqttRegister();
+  gprsPowerOff();
   // Init sensors
   myHumidity.begin();
   lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
@@ -168,14 +171,14 @@ void loop() {
     // collect
     getCoordinatorData(&localData);
     getWeatherData(&localData);
-    gprsPower(1);
+    gprsPowerOn();
     getScaleData(&localData);
     // show
     showLocalData(&localData);
     // send
    
     mqttSendData(&localData);
-    gprsPower(0);
+    gprsPowerOff();
     // sleep
     #ifdef DEBUG
       digitalWrite(LED_BUILTIN, LOW);
@@ -271,7 +274,7 @@ void getScaleData(LocalData_t *local) {
   delay(1000);
   //SerialMon.println("scale1");
   local->weights[0] = scale1.get_value(10);
-  S//erialMon.println("scale2");
+  //SerialMon.println("scale2");
   local->weights[1] = scale2.get_value(10);
   //SerialMon.println("scale3");
   local->weights[2] = scale3.get_value(10);
@@ -317,15 +320,14 @@ void mqttInit() {
     mqttClient[i]=coordinatorAddressString[i];
   }
   mqttClient[16] = '\0';
-  //mqtt.setCallback(mqttCallback);
+  //mqtt.setCallback(mqttCallback); // we can use this to reply options to CO
   SerialMon.print("Mqtt Client ID: ");
   SerialMon.println(mqttClient);
-  mqttRegister();
+
 }
 
 void mqttRegister() {
   SerialMon.println(":: mqttRegsister");
-  gprsResetModem();
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
     mqtt.publish("c/r", mqttClient);
@@ -333,12 +335,11 @@ void mqttRegister() {
   mqtt.disconnect();
   gprsEnd();
   SerialMon.println("Registered CO");
-  //gprsSleep();
 }
 
 void mqttSendData(LocalData_t *local) {
   SerialMon.println(":: mqttSendData");
-  gprsResetModem();
+  //gprsResetModem();
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
     char buf[120] = "";
@@ -351,7 +352,7 @@ void mqttSendData(LocalData_t *local) {
   }  
   mqtt.disconnect();
   gprsEnd();
-  delay(250);
+  delay(250); /// check if this can be removed
 }
 
 //////////// init gprs, connect and disconnect from network ////////////////////
@@ -362,6 +363,14 @@ void gprsTest() {
 }
 
 void gprsResetModem() {
+  SerialMon.println(":: gprsResetModem");
+  modem.restart();
+  String modemInfo = modem.getModemInfo();
+  SerialMon.print(F(" Modem: "));
+  SerialMon.println(modemInfo);
+}
+
+void gprsDisplayModemInfo() {
   SerialMon.println(":: gprsResetModem");
   //modem.restart();
   String modemInfo = modem.getModemInfo();
@@ -389,24 +398,28 @@ void gprsConnectNetwork() {
 
 void gprsEnd() {
   modem.gprsDisconnect();
-  //gprsPower(0);
+  //gprsPowerOff();
   SerialMon.println(" Disconnected");
 }
 
-
-void gprsPower(uint8_t powerState) {
-  SerialMon.println(":: gprsPower");
-  if (powerState == 1){
-    SerialMon.println(" powerup");
+void gprsPowerOn(){
+  Serial.println(":: gprsPowerOn");
+  if (powerState == 0){
     // pull powerbutton low for 1,5 sec
     digitalWrite(GSM_RESET_PIN, LOW);
     delay(1500); // should replace this with a 1,5s sleep
     digitalWrite(GSM_RESET_PIN, HIGH);
+    powerState = 1;
   }
-  else if (powerState == 0 ){
-    SerialMon.println(" powerdown");
-     digitalWrite(GSM_RESET_PIN, LOW);
+}
+
+void gprsPowerOff(){
+  Serial.println(":: gprsPowerOff");
+   if (powerState == 1){
+    // pull powerbutton low for 1,5 sec
+    digitalWrite(GSM_RESET_PIN, LOW);
     delay(1500); // should replace this with a 1,5s sleep
     digitalWrite(GSM_RESET_PIN, HIGH);
-  }
+    powerState = 0;
+    }
 }
