@@ -31,6 +31,9 @@
   #include <Wire.h>
   #include <SPI.h>
 
+  // test includes for splitting to multiple files
+  #include "gprsPower.h"
+
 /******************************* BOARD FUNCTIONS ******************************/
   #define SerialMon SerialUSB
   #define SerialAT Serial
@@ -150,10 +153,10 @@ void setup() {
   // Display information to SerialMon
   displayCoordinatorData();  
   // init communications
-  gprsPowerOn();
+  gprsPowerOn(powerState);
   mqttInit();
   mqttRegister();
-  gprsPowerOff();
+  gprsPowerOff(powerState);
   // Init sensors
   myHumidity.begin();
   lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
@@ -171,14 +174,14 @@ void loop() {
     // collect
     getCoordinatorData(&localData);
     getWeatherData(&localData);
-    gprsPowerOn();
+    gprsPowerOn(powerState);
     getScaleData(&localData);
     // show
     showLocalData(&localData);
     // send
    
     mqttSendData(&localData);
-    gprsPowerOff();
+    gprsPowerOff(powerState);
     // sleep
     #ifdef DEBUG
       digitalWrite(LED_BUILTIN, LOW);
@@ -400,26 +403,4 @@ void gprsEnd() {
   modem.gprsDisconnect();
   //gprsPowerOff();
   SerialMon.println(" Disconnected");
-}
-
-void gprsPowerOn(){
-  Serial.println(":: gprsPowerOn");
-  if (powerState == 0){
-    // pull powerbutton low for 1,5 sec
-    digitalWrite(GSM_RESET_PIN, LOW);
-    delay(1500); // should replace this with a 1,5s sleep
-    digitalWrite(GSM_RESET_PIN, HIGH);
-    powerState = 1;
-  }
-}
-
-void gprsPowerOff(){
-  Serial.println(":: gprsPowerOff");
-   if (powerState == 1){
-    // pull powerbutton low for 1,5 sec
-    digitalWrite(GSM_RESET_PIN, LOW);
-    delay(1500); // should replace this with a 1,5s sleep
-    digitalWrite(GSM_RESET_PIN, HIGH);
-    powerState = 0;
-    }
 }
