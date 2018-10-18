@@ -33,6 +33,7 @@
 
   // test includes for splitting to multiple files
   #include "gprsPower.h"
+  #include "readId.h"
 
 /******************************* BOARD FUNCTIONS ******************************/
   #define SerialMon SerialUSB
@@ -52,7 +53,6 @@
   const uint8_t month = 2;
   const uint8_t year = 17;
   ///////////////////////////////////// ID ///////////////////////////////////////
-  uint8_t coordinatorAddress[8];
   char coordinatorAddressString[17] = "";
 
 /******************************* Communication ********************************/
@@ -109,7 +109,6 @@
   ////////////////////////// FUNCTION DECLARATIONS ///////////////////////////////
   // Something
   void setPinModes();
-  void readIdFromEepRom();
   void initFlash();
   void displayCoordinatorData();
   void delayStartup();
@@ -147,7 +146,7 @@ void setup() {
   // Init SerialMon flash
   initFlash();
   // Get id
-  readIdFromEepRom();
+  readIdFromEepRom(coordinatorAddressString);
   // Delay startup to allow programming
   delayStartup();
   // Display information to SerialMon
@@ -203,21 +202,6 @@ void setPinModes() {
   digitalWrite(GSM_RESET_PIN, HIGH);
 }
 
-void readIdFromEepRom() {
-  //0x50 is the I2c address, 0xF8 is the memory address where the read-only MAC value is
-  Wire.beginTransmission(0x50);
-  Wire.write(0xF8); // LSB 
-  Wire.endTransmission();
-  Wire.requestFrom(0x50, 8); //request 8 bytes from the device
-  uint8_t i = 0;
-  while (Wire.available()){ 
-    coordinatorAddress[i] = Wire.read();
-    i++;
-  }
-  sprintf(coordinatorAddressString, "%02X%02X%02X%02X%02X%02X%02X%02X", coordinatorAddress[0], coordinatorAddress[1], coordinatorAddress[2], coordinatorAddress[3], coordinatorAddress[4], coordinatorAddress[5], coordinatorAddress[6], coordinatorAddress[7]);
-  
-}
-
 void initFlash() {
   SerialFlash.begin(flashChipSelect);
   SerialFlash.sleep(); 
@@ -225,10 +209,10 @@ void initFlash() {
 
 void displayCoordinatorData() {
   SerialMon.println(F("BeeNode v4.0.1a"));
-  char buf[17] = "";
-  sprintf(buf, "%02X%02X%02X%02X%02X%02X%02X%02X", coordinatorAddress[0], coordinatorAddress[1], coordinatorAddress[2], coordinatorAddress[3], coordinatorAddress[4], coordinatorAddress[5], coordinatorAddress[6], coordinatorAddress[7]);
+  //char buf[17] = "";
+  //sprintf(buf, "%02X%02X%02X%02X%02X%02X%02X%02X", coordinatorAddress[0], coordinatorAddress[1], coordinatorAddress[2], coordinatorAddress[3], coordinatorAddress[4], coordinatorAddress[5], coordinatorAddress[6], coordinatorAddress[7]);
   SerialMon.print("Id: ");
-  SerialMon.println(buf);
+  SerialMon.println(coordinatorAddressString);
 } 
 
 void delayStartup() {
