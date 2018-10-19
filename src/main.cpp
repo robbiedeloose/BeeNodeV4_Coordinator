@@ -17,10 +17,12 @@
   #include <Wire.h>
   #include <SPI.h>
 
-  // test includes for splitting to multiple files
-  #include "gprsPower.h"
-  #include "readId.h"
-  #include "sensors.h"
+// test includes for splitting to multiple files
+#include "gprsPower.h"
+#include "readId.h"
+#include "sensors.h"
+#include "rtcFunctions.h"
+
 
 /******************************* BOARD FUNCTIONS ******************************/
   #define SerialMon SerialUSB
@@ -28,19 +30,9 @@
   ////////////////////////////////// SerialMon FLASH ////////////////////////////////
   #include <SerialFlash.h>
   const int flashChipSelect = flashChipCSPin;
-  ////////////////////////////////// RTC + SLEEP /////////////////////////////////
-  #include <RTCZero.h>
-  RTCZero rtc;
-  /* Change these values to set the current initial time */
-  const uint8_t seconds = 0;
-  const uint8_t minutes = 57;
-  const uint8_t hours = 10;
-  /* Change these values to set the current initial date */
-  const uint8_t day = 20;
-  const uint8_t month = 2;
-  const uint8_t year = 17;
-  ///////////////////////////////////// ID ///////////////////////////////////////
-  char coordinatorAddressString[17] = "";
+
+///////////////////////////////////// ID ///////////////////////////////////////
+char coordinatorAddressString[17] = "";
 
 /******************************* Communication ********************************/
   #define TINY_GSM_MODEM_SIM800
@@ -62,10 +54,6 @@
   char mqttClient[17] = "";
   uint8_t powerState = 0;
 
-
-/******************************* STRUCTS **************************************/
-
-
 /******************************* FUNCTION DECLARATIONS ************************/
   ////////////////////////// FUNCTION DECLARATIONS ///////////////////////////////
   // Something
@@ -73,9 +61,6 @@
   void initFlash();
   void displayCoordinatorData();
   void delayStartup();
-  void setRtcAlarm(uint8_t alarmMinutes);
-  void sleepCoordinator();
-  void alarmMatch();
   // Sensors
   void getCoordinatorData(LocalData_t *local);
   void showLocalData(LocalData_t *local);
@@ -113,10 +98,10 @@ void setup() {
   // init communications
   gprsPowerOn(powerState);
   mqttInit();
-  mqttRegister();
+  //mqttRegister();
   gprsPowerOff(powerState);
   // Init sensors
-
+  initSensors();
   delay(2000); // let all initialisations run out
 }
 
@@ -137,7 +122,7 @@ void loop() {
     showLocalData(&localData);
     // send
    
-    mqttSendData(&localData);
+    //mqttSendData(&localData);
     gprsPowerOff(powerState);
     // sleep
     #ifdef DEBUG
@@ -182,22 +167,6 @@ void delayStartup() {
   SerialMon.println();
 }
 
-/******************************* RTC + SLEEP **********************************/
-void setRtcAlarm(uint8_t alarmMinutes) {
-  SerialMon.println(":: setRtcAlarm");
-  rtc.setAlarmSeconds(0);
-  rtc.setAlarmMinutes((rtc.getMinutes()+alarmMinutes)%60);
-  rtc.enableAlarm(rtc.MATCH_MMSS);
-  rtc.attachInterrupt(alarmMatch);
-}
-
-void sleepCoordinator() {
-  SerialMon.println(F("sleep"));
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(500); // give SerialMon time to complete before node goes to sleep
-}
-
-void alarmMatch() {}
 
 /******************************* sensors **************************************/
 void getCoordinatorData(LocalData_t *local) {

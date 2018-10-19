@@ -4,6 +4,7 @@
 
 #include <arduino.h>
 #include "sensors.h"
+#include "pins.h"
 /******************************* Sensors **************************************/
 //////////////////////////////// HUMIDITY //////////////////////////////////////
 #include "SparkFunHTU21D.h"
@@ -14,20 +15,6 @@ BH1750 lightMeter;
 
 ////////////////////////////////// SCALES ////////////////////////////////////////
 #include "HX711.h"
-#define SCALE_1_CLOCK 7  // wit-blauw 
-#define SCALE_1_DATA 8   // blauw
-#define SCALE_2_CLOCK 9  // wit-groen
-#define SCALE_2_DATA 10   // groen
-#define SCALE_3_CLOCK 11  // wit-bruin
-#define SCALE_3_DATA 12   // bruin
-
-#define SCALE_4_CLOCK 0  // geel
-#define SCALE_4_DATA 1   // blauw
-#define SCALE_5_CLOCK A1 // geel
-#define SCALE_5_DATA A2  // blauw
-#define SCALE_6_CLOCK A3 // geel
-#define SCALE_6_DATA A4  // blauw
-
 
 // DT, SCK  // parameter "gain" is ommited; the default value 128 is used by the library
 HX711 scale1(SCALE_1_DATA, SCALE_1_CLOCK); 
@@ -45,8 +32,11 @@ void initSensors() {
 
 void getWeatherData(LocalData_t *local) {
     SerialMon.println(":: getWeatherData");
+    SerialMon.println(" temp");
     local->baseTemp = myHumidity.readTemperature() * 100;
+    SerialMon.println(" hum");
     local->baseHum = myHumidity.readHumidity() * 100;
+    SerialMon.println(" lux");
     local->baseLux = lightMeter.readLightLevel();
 }
 
