@@ -1,6 +1,19 @@
 #ifndef PINS_H   /* Include guard */
 #define PINS_H
 
+#include <arduino.h>
+
+///////////////////////// OPTIONS //////////////////////////////////////////////
+#define SLEEPTIMER 1      // how often do we want to send data (in minutes)
+#define STARTDELAY 20      // delay start of programm, needed for reprogamming when using sleep
+#define DEBUG             // comment to use sleep
+#define DELAY_TIMER 10000  
+///////////////////////// PIN DEFINES //////////////////////////////////////////
+#define flashChipCSPin 4
+#define buildInLed 13
+
+#define GSM_RESET_PIN 2
+
 #define SCALE_1_CLOCK 7  // wit-blauw 
 #define SCALE_1_DATA 8   // blauw
 #define SCALE_2_CLOCK 9  // wit-groen

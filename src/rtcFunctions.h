@@ -3,6 +3,7 @@
 
 #include <arduino.h>
 #include <RTCZero.h>
+#include "pins.h"
 
 /* Change these values to set the current initial time */
 const uint8_t seconds = 0;
@@ -16,6 +17,7 @@ const uint8_t year = 17;
 void setRtcAlarm(uint8_t alarmMinutes);
 void sleepCoordinator();
 void alarmMatch();
+void delayStartup();
 
 #endif
 

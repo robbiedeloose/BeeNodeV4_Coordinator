@@ -1,16 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // BEELOG V4 
 ////////////////////////////////////////////////////////////////////////////////
-///////////////////////// OPTIONS //////////////////////////////////////////////
-  #define SLEEPTIMER 1      // how often do we want to send data (in minutes)
-  #define STARTDELAY 20      // delay start of programm, needed for reprogamming when using sleep
-  #define DEBUG             // comment to use sleep
-  #define DELAY_TIMER 10000  
-///////////////////////// PIN DEFINES //////////////////////////////////////////
-  #define flashChipCSPin 4
-  #define buildInLed 13
 
-  #define GSM_RESET_PIN 2
 
 ///////////////////////// General Stuff ////////////////////////////////////////
   #include <Arduino.h>
@@ -22,6 +13,7 @@
 #include "readId.h"
 #include "sensors.h"
 #include "rtcFunctions.h"
+#include "pins.h"
 
 
 /******************************* BOARD FUNCTIONS ******************************/
@@ -121,7 +113,6 @@ void loop() {
     // show
     showLocalData(&localData);
     // send
-   
     //mqttSendData(&localData);
     gprsPowerOff(powerState);
     // sleep
@@ -134,15 +125,6 @@ void loop() {
 }
 
 /******************************* BOARD SPECIFIC *******************************/
-void setPinModes() {
-  pinMode(A5,INPUT);
-  //led
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, HIGH);
-  //gprssleep
-  pinMode(GSM_RESET_PIN, OUTPUT);
-  digitalWrite(GSM_RESET_PIN, HIGH);
-}
 
 void initFlash() {
   SerialFlash.begin(flashChipSelect);
@@ -156,17 +138,6 @@ void displayCoordinatorData() {
   SerialMon.print("Id: ");
   SerialMon.println(coordinatorAddressString);
 } 
-
-void delayStartup() {
-   /***** IMPORTANT DELAY FOR CODE UPLOAD BEFORE USB PORT DETACH DURING SLEEP *****/
-  for(uint8_t i = 0; i < (STARTDELAY*2)+1; i++) {
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    SerialMon.print(".");
-    delay(500);
-  }
-  SerialMon.println();
-}
-
 
 /******************************* sensors **************************************/
 void getCoordinatorData(LocalData_t *local) {
