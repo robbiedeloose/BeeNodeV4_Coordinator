@@ -13,7 +13,9 @@
   };
 
     void initSensors();
+    void getCoordinatorData(LocalData_t *local);
     void getWeatherData(LocalData_t *local);
     void getScaleData(LocalData_t *local);
+    void showLocalData(LocalData_t *local) ;
 
 #endif
