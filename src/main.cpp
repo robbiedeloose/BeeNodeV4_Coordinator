@@ -14,8 +14,6 @@
 #include "sensors.h"
 #include "rtcFunctions.h"
 #include "pins.h"
-#include "flash.h"
-#include "config.h"
 
 /******************************* BOARD FUNCTIONS ******************************/
   #define SerialMon SerialUSB
@@ -46,6 +44,14 @@ char coordinatorAddressString[17] = "";
 
 /******************************* FUNCTION DECLARATIONS ************************/
   ////////////////////////// FUNCTION DECLARATIONS ///////////////////////////////
+  // Something
+  void setPinModes();
+  void initFlash();
+  void displayCoordinatorData();
+  void delayStartup();
+  // Sensors
+  void getCoordinatorData(LocalData_t *local);
+  void showLocalData(LocalData_t *local);
   // Communications
   void gprsTest();
   void gprsResetModem();
@@ -75,7 +81,7 @@ void setup() {
   // Delay startup to allow programming
   delayStartup();
   // Display information to SerialMon
-  displayCoordinatorData(coordinatorAddressString);  
+  displayCoordinatorData();  
   // init communications
   gprsPowerOn(powerState);
   mqttInit();
@@ -112,6 +118,48 @@ void loop() {
     #endif
 }
 
+/******************************* BOARD SPECIFIC *******************************/
+
+
+void displayCoordinatorData() {
+  SerialMon.println(F("BeeNode v4.0.1a"));
+  //char buf[17] = "";
+  //sprintf(buf, "%02X%02X%02X%02X%02X%02X%02X%02X", coordinatorAddress[0], coordinatorAddress[1], coordinatorAddress[2], coordinatorAddress[3], coordinatorAddress[4], coordinatorAddress[5], coordinatorAddress[6], coordinatorAddress[7]);
+  SerialMon.print("Id: ");
+  SerialMon.println(coordinatorAddressString);
+} 
+
+/******************************* sensors **************************************/
+void getCoordinatorData(LocalData_t *local) {
+  SerialMon.println(":: getCoordinatorData");
+  // voltage / id
+  local->baseBat = analogRead(A5)*4.3;
+}
+
+void showLocalData(LocalData_t *local) {
+  SerialMon.println(":: showLocalData");
+  SerialMon.print("Temperature: ");
+  SerialMon.println(local->baseTemp);
+  SerialMon.print("Humidity: ");
+  SerialMon.println(local->baseHum);
+  SerialMon.print("Lux: ");
+  SerialMon.println(local->baseLux);
+  SerialMon.print("Bat: ");
+  SerialMon.println(local->baseBat);
+  SerialMon.print("Scale1: ");
+  SerialMon.println(local->weights[0]);
+  SerialMon.print("Scale2: ");
+  SerialMon.println(local->weights[1]);
+  SerialMon.print("Scale3: ");
+  SerialMon.println(local->weights[2]);
+  SerialMon.print("Scale4: ");
+  SerialMon.println(local->weights[3]);
+  SerialMon.print("Scale5: ");
+  SerialMon.println(local->weights[4]);
+  SerialMon.print("Scale6: ");
+  SerialMon.println(local->weights[5]);
+}
+
 /******************************* Communication ********************************/
 //////////// MQTT Code /////////////////////////////////////////////////////////
 void mqttInit() {
@@ -124,6 +172,7 @@ void mqttInit() {
   //mqtt.setCallback(mqttCallback); // we can use this to reply options to CO
   SerialMon.print("Mqtt Client ID: ");
   SerialMon.println(mqttClient);
+
 }
 
 void mqttRegister() {

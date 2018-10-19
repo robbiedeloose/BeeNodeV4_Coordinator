@@ -28,6 +28,4 @@
 #define SCALE_6_CLOCK A3 // geel
 #define SCALE_6_DATA A4  // blauw
 
-void setPinModes();
-
 #endif
