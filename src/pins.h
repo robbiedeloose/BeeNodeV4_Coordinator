@@ -3,9 +3,6 @@
 
 #include <arduino.h>
 
-#define SerialMon SerialUSB
-#define SerialAT Serial
-
 ///////////////////////// OPTIONS //////////////////////////////////////////////
 #define SLEEPTIMER 1      // how often do we want to send data (in minutes)
 #define STARTDELAY 20      // delay start of programm, needed for reprogamming when using sleep
@@ -30,14 +27,6 @@
 #define SCALE_5_DATA A2  // blauw
 #define SCALE_6_CLOCK A3 // geel
 #define SCALE_6_DATA A4  // blauw
-
- struct LocalData_t {
-    int16_t baseTemp;
-    uint16_t baseHum;
-    uint16_t baseLux;
-    uint16_t baseBat;
-    long int weights[6];
-  };
 
 void setPinModes();
 

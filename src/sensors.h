@@ -3,7 +3,14 @@
 
 #include <arduino.h>
 #include <Wire.h>
-#include "pins.h"
+
+ struct LocalData_t {
+    int16_t baseTemp;
+    uint16_t baseHum;
+    uint16_t baseLux;
+    uint16_t baseBat;
+    long int weights[6];
+  };
 
     void initSensors();
     void getCoordinatorData(LocalData_t *local);
