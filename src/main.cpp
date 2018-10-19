@@ -12,7 +12,7 @@
 #include "gprsPower.h"
 #include "readId.h"
 #include "sensors.h"
-#include "rtcsleep.h"
+#include "rtcFunctions.h"
 #include "pins.h"
 #include "flash.h"
 #include "config.h"
