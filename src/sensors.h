@@ -2,6 +2,7 @@
 #define SENSOR_H
 
 #include <arduino.h>
+#include <Wire.h>
 
  struct LocalData_t {
     int16_t baseTemp;

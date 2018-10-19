@@ -5,8 +5,8 @@
 
 ///////////////////////// General Stuff ////////////////////////////////////////
   #include <Arduino.h>
-  #include <Wire.h>
-  #include <SPI.h>
+
+
 
 // test includes for splitting to multiple files
 #include "gprsPower.h"
@@ -15,13 +15,9 @@
 #include "rtcFunctions.h"
 #include "pins.h"
 
-
 /******************************* BOARD FUNCTIONS ******************************/
   #define SerialMon SerialUSB
   #define SerialAT Serial
-  ////////////////////////////////// SerialMon FLASH ////////////////////////////////
-  #include <SerialFlash.h>
-  const int flashChipSelect = flashChipCSPin;
 
 ///////////////////////////////////// ID ///////////////////////////////////////
 char coordinatorAddressString[17] = "";
@@ -70,7 +66,6 @@ char coordinatorAddressString[17] = "";
 
 /******************************************************************************/
 
-/////////////// SETUP //////////////////////////////////////////////////////////
 void setup() {
   // Define used pin states and put everything else high
   setPinModes();
@@ -97,7 +92,6 @@ void setup() {
   delay(2000); // let all initialisations run out
 }
 
-/////////////// LOOP ///////////////////////////////////////////////////////////
 void loop() {
     SerialMon.println(":: Loop");
     digitalWrite(LED_BUILTIN, HIGH);
@@ -126,10 +120,6 @@ void loop() {
 
 /******************************* BOARD SPECIFIC *******************************/
 
-void initFlash() {
-  SerialFlash.begin(flashChipSelect);
-  SerialFlash.sleep(); 
-}
 
 void displayCoordinatorData() {
   SerialMon.println(F("BeeNode v4.0.1a"));
