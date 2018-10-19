@@ -30,6 +30,12 @@ void initSensors() {
     lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
 }
 
+void getCoordinatorData(LocalData_t *local) {
+  SerialMon.println(":: getCoordinatorData");
+  // voltage / id
+  local->baseBat = analogRead(A5)*4.3;
+}
+
 void getWeatherData(LocalData_t *local) {
     SerialMon.println(":: getWeatherData");
     SerialMon.println(" temp");
@@ -56,4 +62,28 @@ void getScaleData(LocalData_t *local) {
     //SerialMon.println("scale6");
     local->weights[5] = scale6.get_value(10);
     //SerialMon.println("done");
+}
+
+void showLocalData(LocalData_t *local) {
+  SerialMon.println(":: showLocalData");
+  SerialMon.print("Temperature: ");
+  SerialMon.println(local->baseTemp);
+  SerialMon.print("Humidity: ");
+  SerialMon.println(local->baseHum);
+  SerialMon.print("Lux: ");
+  SerialMon.println(local->baseLux);
+  SerialMon.print("Bat: ");
+  SerialMon.println(local->baseBat);
+  SerialMon.print("Scale1: ");
+  SerialMon.println(local->weights[0]);
+  SerialMon.print("Scale2: ");
+  SerialMon.println(local->weights[1]);
+  SerialMon.print("Scale3: ");
+  SerialMon.println(local->weights[2]);
+  SerialMon.print("Scale4: ");
+  SerialMon.println(local->weights[3]);
+  SerialMon.print("Scale5: ");
+  SerialMon.println(local->weights[4]);
+  SerialMon.print("Scale6: ");
+  SerialMon.println(local->weights[5]);
 }
