@@ -24,46 +24,48 @@ void initSensors() {
 }
 
 void getCoordinatorData(LocalData_t *local) {
-  SerialMon.println(":: getCoordinatorData");
+  SerialMon.print(":: getCoordinatorData - ");
   local->baseBat = analogRead(A5)*4.3;
+      SerialMon.println("done");
 }
 
 void getWeatherData(LocalData_t *local) {
-    SerialMon.println(":: getWeatherData");
-    SerialMon.println(" temp");
+    SerialMon.print(":: getWeatherData - ");
+    SerialMon.print("temp, ");
     local->baseTemp = myHumidity.readTemperature() * 100;
-    SerialMon.println(" hum");
+    SerialMon.print("hum, ");
     local->baseHum = myHumidity.readHumidity() * 100;
-    SerialMon.println(" lux");
+    SerialMon.print("lux, ");
     local->baseLux = lightMeter.readLightLevel();
+    SerialMon.println("done");
 }
 
 void getScaleData(LocalData_t *local) {
-    SerialMon.println(":: getScaleData");
-    SerialMon.println("scale1");
+    SerialMon.print(":: getScaleData - ");
+    SerialMon.print("1, ");
     local->weights[0] = scale1.get_value(10);
-    SerialMon.println("scale2");
+    SerialMon.print("2, ");
     local->weights[1] = scale2.get_value(10);
-    SerialMon.println("scale3");
+    SerialMon.print("3, ");
     local->weights[2] = scale3.get_value(10);
-    SerialMon.println("scale4");
+    SerialMon.print("4, ");
     local->weights[3] = scale4.get_value(10);
-    SerialMon.println("scale5");
+    SerialMon.print("5, ");
     local->weights[4] = scale5.get_value(10);
-    SerialMon.println("scale6");
+    SerialMon.print("6, ");
     local->weights[5] = scale6.get_value(10);
     SerialMon.println("done");
 }
 
 void showLocalData(LocalData_t *local) {
-  SerialMon.println(":: showLocalData");
-  SerialMon.print("Temperature: ");
+  SerialMon.println(":: showLocalData ::");
+  SerialMon.print("Temperature:/t");
   SerialMon.println(local->baseTemp);
-  SerialMon.print("Humidity: ");
+  SerialMon.print("Humidity:/t");
   SerialMon.println(local->baseHum);
-  SerialMon.print("Lux: ");
+  SerialMon.print("Lux:/t/t");
   SerialMon.println(local->baseLux);
-  SerialMon.print("Bat: ");
+  SerialMon.print("Bat:/t/t");
   SerialMon.println(local->baseBat);
   SerialMon.print("Scale1: ");
   SerialMon.println(local->weights[0]);
