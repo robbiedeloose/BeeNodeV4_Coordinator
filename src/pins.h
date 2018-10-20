@@ -36,4 +36,7 @@
     long int weights[6];
   };
 
+
+void setPinModes();
+
 #endif

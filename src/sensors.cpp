@@ -1,10 +1,7 @@
-
-#define SerialMon SerialUSB
-#define SerialAT Serial
-
 #include <arduino.h>
 #include "sensors.h"
 #include "pins.h"
+#include "config.h"
 /******************************* Sensors **************************************/
 //////////////////////////////// HUMIDITY //////////////////////////////////////
 #include "SparkFunHTU21D.h"
@@ -49,19 +46,19 @@ void getWeatherData(LocalData_t *local) {
 void getScaleData(LocalData_t *local) {
     SerialMon.println(":: getScaleData");
     delay(1000);
-    //SerialMon.println("scale1");
+    SerialMon.println("scale1");
     local->weights[0] = scale1.get_value(10);
-    //SerialMon.println("scale2");
+    SerialMon.println("scale2");
     local->weights[1] = scale2.get_value(10);
-    //SerialMon.println("scale3");
+    SerialMon.println("scale3");
     local->weights[2] = scale3.get_value(10);
-    //SerialMon.println("scale4");
+    SerialMon.println("scale4");
     local->weights[3] = scale4.get_value(10);
-    //SerialMon.println("scale5");
+    SerialMon.println("scale5");
     local->weights[4] = scale5.get_value(10);
-    //SerialMon.println("scale6");
+    SerialMon.println("scale6");
     local->weights[5] = scale6.get_value(10);
-    //SerialMon.println("done");
+    SerialMon.println("done");
 }
 
 void showLocalData(LocalData_t *local) {
