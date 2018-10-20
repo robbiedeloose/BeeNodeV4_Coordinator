@@ -9,9 +9,9 @@
   void gprsResetModem();
   void gprsConnectNetwork();
   void gprsEnd();
-  void gprsPowerOn();
-  void gprsPowerOff();  
-  // MQTT
+  uint8_t gprsPowerOn(uint8_t powerstate);
+  uint8_t gprsPowerOff(uint8_t powerstate);
+
   void mqttInit(char* coordinatorAddressString);
   void mqttRegister(char* coordinatorAddressString);
   void mqttSendData(LocalData_t *local);

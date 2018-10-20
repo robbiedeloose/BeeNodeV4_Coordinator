@@ -2,17 +2,14 @@
 #include "sensors.h"
 #include "pins.h"
 #include "config.h"
-/******************************* Sensors **************************************/
-//////////////////////////////// HUMIDITY //////////////////////////////////////
+/* Humidity and temp */
 #include "SparkFunHTU21D.h"
 HTU21D myHumidity;
-//////////////////////////////// LUX ///////////////////////////////////////////
+/* Lux */
 #include <BH1750.h>
 BH1750 lightMeter;
-
-////////////////////////////////// SCALES ////////////////////////////////////////
+/* Scales */
 #include "HX711.h"
-
 // DT, SCK  // parameter "gain" is ommited; the default value 128 is used by the library
 HX711 scale1(SCALE_1_DATA, SCALE_1_CLOCK); 
 HX711 scale2(SCALE_2_DATA, SCALE_2_CLOCK); 
@@ -21,7 +18,6 @@ HX711 scale4(SCALE_4_DATA, SCALE_4_CLOCK);
 HX711 scale5(SCALE_5_DATA, SCALE_5_CLOCK); 
 HX711 scale6(SCALE_6_DATA, SCALE_6_CLOCK); 
 
-
 void initSensors() {
     myHumidity.begin();
     lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
@@ -29,7 +25,6 @@ void initSensors() {
 
 void getCoordinatorData(LocalData_t *local) {
   SerialMon.println(":: getCoordinatorData");
-  // voltage / id
   local->baseBat = analogRead(A5)*4.3;
 }
 
@@ -45,7 +40,6 @@ void getWeatherData(LocalData_t *local) {
 
 void getScaleData(LocalData_t *local) {
     SerialMon.println(":: getScaleData");
-    delay(1000);
     SerialMon.println("scale1");
     local->weights[0] = scale1.get_value(10);
     SerialMon.println("scale2");

@@ -5,3 +5,8 @@ void displayCoordinatorData(char* coordinatorAddressString) {
     SerialMon.print("Id: ");
     SerialMon.println(coordinatorAddressString);
 } 
+
+// display sleep interval
+// display operator
+// display mqtt settings
+// what other options need to include

@@ -18,7 +18,7 @@
   PubSubClient mqtt(client);
   char mqttClient[17] = "";
 
-//////////// MQTT Code /////////////////////////////////////////////////////////
+/* MQTT */
 void mqttInit(char* coordinatorAddressString) {
   SerialMon.println(":: mqttInit");
   mqtt.setServer(broker, mqttPort);
@@ -60,7 +60,7 @@ void mqttSendData(LocalData_t *local) {
   delay(250); /// check if this can be removed
 }
 
-//////////// init gprs, connect and disconnect from network ////////////////////
+/* GPRS */
 void gprsTest() {
   gprsResetModem();
   gprsConnectNetwork();
@@ -105,4 +105,26 @@ void gprsEnd() {
   modem.gprsDisconnect();
   //gprsPowerOff();
   SerialMon.println(" Disconnected");
+}
+
+uint8_t gprsPowerOn(uint8_t powerstate) {
+    Serial.println(":: gprsPowerOn");
+    if (powerstate == 0){
+      // pull powerbutton low for 1,5 sec
+      digitalWrite(GSM_RESET_PIN, LOW);
+      delay(1500); // should replace this with a 1,5s sleep
+      digitalWrite(GSM_RESET_PIN, HIGH);
+    }
+    return 1;
+}
+
+uint8_t gprsPowerOff(uint8_t powerstate) {
+    Serial.println(":: gprsPowerOff");
+    if (powerstate == 1){
+      // pull powerbutton low for 1,5 sec
+      digitalWrite(GSM_RESET_PIN, LOW);
+      delay(1500); // should replace this with a 1,5s sleep
+      digitalWrite(GSM_RESET_PIN, HIGH);
+    }
+    return 0;
 }

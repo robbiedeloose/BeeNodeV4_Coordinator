@@ -1,6 +1,4 @@
-#include "rtcFunctions.h"
-
-#define SerialMon SerialUSB
+#include "rtcsleep.h"
 
 RTCZero rtc;
 

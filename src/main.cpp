@@ -2,31 +2,17 @@
 // BEELOG V4 
 ////////////////////////////////////////////////////////////////////////////////
 
-
-///////////////////////// General Stuff ////////////////////////////////////////
-  #include <Arduino.h>
-
-// test includes for splitting to multiple files
-#include "gprsPower.h"
+#include <Arduino.h>
+#include "config.h"
+#include "pins.h"
 #include "readId.h"
 #include "sensors.h"
-#include "rtcFunctions.h"
-#include "pins.h"
+#include "rtcsleep.h"
 #include "flash.h"
-#include "config.h"
 #include "gprs.h"
 
-///////////////////////////////////// ID ///////////////////////////////////////
 char coordinatorAddressString[17] = "";
-
-/******************************* Communication ********************************/
-
-  uint8_t powerState = 0;
-
-/******************************* FUNCTION DECLARATIONS ************************/
-  ////////////////////////// FUNCTION DECLARATIONS ///////////////////////////////
-  // Communications
-
+uint8_t powerState = 0;
 
 void setup() {
   // Define used pin states and put everything else high
@@ -55,28 +41,26 @@ void setup() {
 }
 
 void loop() {
-    SerialMon.println(":: Loop");
-    digitalWrite(LED_BUILTIN, HIGH);
-    LocalData_t localData;
+  SerialMon.println(":: Main : Loop");
+  digitalWrite(LED_BUILTIN, HIGH);
+  LocalData_t localData;
 
-    // set new alarm
-    setRtcAlarm(SLEEPTIMER);
-    // collect
-    getCoordinatorData(&localData);
-    getWeatherData(&localData);
-    gprsPowerOn(powerState);
-    getScaleData(&localData);
-    // send
-    //mqttSendData(&localData);
-    gprsPowerOff(powerState);
-    // sleep
-    #ifdef DEBUG
-      digitalWrite(LED_BUILTIN, LOW);
-      delay(DELAY_TIMER);
-    #else
-      sleepCoordinator();
-    #endif
+  // set new alarm
+  setRtcAlarm(SLEEPTIMER);
+  // collect
+  getCoordinatorData(&localData);
+  getWeatherData(&localData);
+  gprsPowerOn(powerState);
+  getScaleData(&localData);
+  showLocalData(&localData);
+  // send
+  //mqttSendData(&localData);
+  gprsPowerOff(powerState);
+  // sleep
+  #ifdef DEBUG
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(DELAY_TIMER);
+  #else
+    sleepCoordinator();
+  #endif
 }
-
-
-/******************************* Communication ********************************/
