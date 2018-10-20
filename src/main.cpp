@@ -52,6 +52,7 @@ void loop() {
   getWeatherData(&localData);
   gprsPowerOn(powerState);
   getScaleData(&localData);
+  
   showLocalData(&localData);
   // send
   //mqttSendData(&localData);
