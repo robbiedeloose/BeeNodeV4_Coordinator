@@ -50,11 +50,10 @@ void loop() {
   // collect
   getCoordinatorData(&localData);
   getWeatherData(&localData);
-  gprsPowerOn(powerState);
   getScaleData(&localData);
-  
   showLocalData(&localData);
   // send
+  gprsPowerOn(powerState);
   //mqttSendData(&localData);
   gprsPowerOff(powerState);
   // sleep

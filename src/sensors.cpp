@@ -44,19 +44,19 @@ void getWeatherData(LocalData_t *local) {
 void getScaleData(LocalData_t *local) {
     SerialMon.print(":: getScaleData - ");
     SerialMon.print("1, ");
-    local->weights[0] = scale1.get_value(10);
+    local->weights[0] = scale1.get_value(SCALE_SAMPLE_RATE);
     SerialMon.print("2, ");
-    local->weights[1] = scale2.get_value(10);
+    local->weights[1] = scale2.get_value(SCALE_SAMPLE_RATE);
     SerialMon.print("3, ");
-    local->weights[2] = scale3.get_value(10);
+    local->weights[2] = scale3.get_value(SCALE_SAMPLE_RATE);
     SerialMon.print("4, ");
-    local->weights[3] = scale4.get_value(10);
+    local->weights[3] = scale4.get_value(SCALE_SAMPLE_RATE);
     SerialMon.print("5, ");
-    local->weights[4] = scale5.get_value(10);
+    local->weights[4] = scale5.get_value(SCALE_SAMPLE_RATE);
     SerialMon.print("6, ");
-    local->weights[5] = scale6.get_value(10);
+    local->weights[5] = scale6.get_value(SCALE_SAMPLE_RATE);
     SerialMon.print("ref, ");
-    local->refWeight = scaleRef.get_value(10);
+    local->refWeight = scaleRef.get_value(SCALE_SAMPLE_RATE);
     SerialMon.println("done");
 }
 
