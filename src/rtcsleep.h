@@ -3,6 +3,7 @@
 
 #include <arduino.h>
 #include <RTCZero.h>
+  
 #include "pins.h"
 #include "config.h"
 
@@ -15,6 +16,7 @@ const uint8_t day = 20;
 const uint8_t month = 2;
 const uint8_t year = 17;
 
+void initRtc();
 void setRtcAlarm(uint8_t alarmMinutes);
 void sleepCoordinator();
 void alarmMatch();

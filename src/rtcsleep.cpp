@@ -2,15 +2,17 @@
 
 RTCZero rtc;
 
+void initRtc(){
+  rtc.begin();
+  rtc.setTime(hours, minutes, seconds);
+  rtc.setDate(day, month, year);
+}
+
 void setRtcAlarm(uint8_t alarmMinutes) {
   SerialMon.print(":: setRtcAlarm - ");
-  SerialMon.print("set minutes: ");
-  rtc.setAlarmSeconds(15);
+  rtc.setAlarmSeconds(00);
   rtc.setAlarmMinutes((rtc.getMinutes()+alarmMinutes)%60);
-  SerialMon.print((rtc.getMinutes()+alarmMinutes)%60);
-  SerialMon.print(", enable alarm, ");
-  rtc.enableAlarm(rtc.MATCH_SS);
-  SerialMon.print("attach interrupt, ");
+  rtc.enableAlarm(rtc.MATCH_MMSS);
   rtc.attachInterrupt(alarmMatch);
   SerialMon.println("done");
 }
@@ -18,6 +20,7 @@ void setRtcAlarm(uint8_t alarmMinutes) {
 void sleepCoordinator() {
   SerialMon.println(":: sleepCoordinator");
   delay(500); // give SerialMon time to complete before node goes to sleep
+  USBDevice.detach();
   rtc.standbyMode();
 }
 

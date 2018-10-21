@@ -17,7 +17,7 @@ HX711 scale3(SCALE_3_DATA, SCALE_3_CLOCK);
 HX711 scale4(SCALE_4_DATA, SCALE_4_CLOCK); 
 HX711 scale5(SCALE_5_DATA, SCALE_5_CLOCK); 
 HX711 scale6(SCALE_6_DATA, SCALE_6_CLOCK); 
-//HX711 scaleRef(SCALE_REF_DATA, SCALE_REF_CLOCK); 
+HX711 scaleRef(SCALE_REF_DATA, SCALE_REF_CLOCK); 
 
 void initSensors() {
   myHumidity.begin();
@@ -55,8 +55,8 @@ void getScaleData(LocalData_t *local) {
   local->weights[4] = scale5.get_value(SCALE_SAMPLE_RATE);
   SerialMon.print("6, ");
   local->weights[5] = scale6.get_value(SCALE_SAMPLE_RATE);
-  //SerialMon.print("ref, ");
-  //local->refWeight = scaleRef.get_value(SCALE_SAMPLE_RATE);
+  SerialMon.print("ref, ");
+  local->refWeight = scaleRef.get_value(SCALE_SAMPLE_RATE);
   SerialMon.println("done");
 }
 

@@ -42,6 +42,7 @@ void setup() {
     SerialMon.println(":::: Sleep Disabled");
   }
   powerState = gprsPowerOn(powerState);
+  initRtc();
   mqttInit(coordinatorAddressString);
   mqttRegister(coordinatorAddressString);
   //powerState = gprsPowerOff(powerState);
@@ -57,7 +58,9 @@ void loop() {
   LocalData_t localData;
 
   // set new alarm
-  //setRtcAlarm(SLEEPTIMER);
+   if (sleepEnabled){
+    setRtcAlarm(SLEEPTIMER);
+   }
   // collect
   getCoordinatorData(&localData);
   getWeatherData(&localData);
@@ -68,11 +71,9 @@ void loop() {
   mqttSendData(&localData);
   powerState = gprsPowerOff(powerState);
   // sleep
-  if (sleepEnabled)
-  {
+  if (sleepEnabled){
     SerialMon.println(":: Sleep");
     digitalWrite(LED_BUILTIN, LOW);
-    setRtcAlarm(5);
     sleepCoordinator();
   } 
   else {
