@@ -2,7 +2,7 @@
 
 RTCZero rtc;
 
-void initRtc(){
+void initRtc() {
   rtc.begin();
   rtc.setTime(hours, minutes, seconds);
   rtc.setDate(day, month, year);
@@ -25,7 +25,7 @@ void sleepCoordinator() {
 }
 
 void alarmMatch() {
-    Serial.println(":: wake");
+  Serial.println(":: wake");
 }
 
 void delayStartup() {
