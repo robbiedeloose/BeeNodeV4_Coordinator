@@ -27,6 +27,8 @@
 #define SCALE_REF_CLOCK 18 // geel
 #define SCALE_REF_DATA 38 // blauw
 
+#define SLEEP_ENABLED 2
+
  struct LocalData_t {
     int16_t baseTemp;
     uint16_t baseHum;

@@ -13,6 +13,7 @@
 
 char coordinatorAddressString[17] = "";
 uint8_t powerState = 0;
+bool sleepEnabled = false;
 
 void setup() {
   // Define used pin states and put everything else high
@@ -29,14 +30,24 @@ void setup() {
   // Delay startup to allow programming
   delayStartup();
   // Display information to SerialMon
+  digitalWrite(LED_BUILTIN, HIGH);
   displayCoordinatorData(coordinatorAddressString);  
   // init communications
+  if (digitalRead(SLEEP_ENABLED) == LOW){
+    sleepEnabled = true;
+    SerialMon.println(":::: Sleep Enabled");
+  } 
+  else {
+    sleepEnabled = false;
+    SerialMon.println(":::: Sleep Disabled");
+  }
   powerState = gprsPowerOn(powerState);
   mqttInit(coordinatorAddressString);
   mqttRegister(coordinatorAddressString);
   //powerState = gprsPowerOff(powerState);
   // Init sensors
   initSensors();
+  digitalWrite(LED_BUILTIN, LOW);
   delay(2000); // let all initialisations run out
 }
 
@@ -46,7 +57,7 @@ void loop() {
   LocalData_t localData;
 
   // set new alarm
-  setRtcAlarm(SLEEPTIMER);
+  //setRtcAlarm(SLEEPTIMER);
   // collect
   getCoordinatorData(&localData);
   getWeatherData(&localData);
@@ -57,12 +68,17 @@ void loop() {
   mqttSendData(&localData);
   powerState = gprsPowerOff(powerState);
   // sleep
-  #ifdef DEBUG
-  SerialMon.println(":: Wait");
+  if (sleepEnabled)
+  {
+    SerialMon.println(":: Sleep");
+    digitalWrite(LED_BUILTIN, LOW);
+    setRtcAlarm(5);
+    sleepCoordinator();
+  } 
+  else {
+    SerialMon.println(":: Wait");
     digitalWrite(LED_BUILTIN, LOW);
     delay(DELAY_TIMER);
-  #else
-    setRtcAlarm(15);
-    sleepCoordinator();
-  #endif
+  }
+
 }

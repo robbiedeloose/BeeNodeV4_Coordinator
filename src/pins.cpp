@@ -8,4 +8,7 @@ void setPinModes() {
   //gprssleep
   pinMode(GSM_RESET_PIN, OUTPUT);
   digitalWrite(GSM_RESET_PIN, HIGH);
+  //sleep enable
+  pinMode(SLEEP_ENABLED, INPUT_PULLUP);
+  digitalWrite(SLEEP_ENABLED, HIGH);
 }

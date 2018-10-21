@@ -3,21 +3,26 @@
 RTCZero rtc;
 
 void setRtcAlarm(uint8_t alarmMinutes) {
-  SerialMon.println(":: setRtcAlarm");
-  rtc.setAlarmSeconds(0);
+  SerialMon.print(":: setRtcAlarm - ");
+  SerialMon.print("set minutes: ");
+  rtc.setAlarmSeconds(15);
   rtc.setAlarmMinutes((rtc.getMinutes()+alarmMinutes)%60);
-  rtc.enableAlarm(rtc.MATCH_MMSS);
+  SerialMon.print((rtc.getMinutes()+alarmMinutes)%60);
+  SerialMon.print(", enable alarm, ");
+  rtc.enableAlarm(rtc.MATCH_SS);
+  SerialMon.print("attach interrupt, ");
   rtc.attachInterrupt(alarmMatch);
+  SerialMon.println("done");
 }
 
 void sleepCoordinator() {
-  SerialMon.println(F("sleep"));
-  digitalWrite(LED_BUILTIN, LOW);
+  SerialMon.println(":: sleepCoordinator");
   delay(500); // give SerialMon time to complete before node goes to sleep
+  rtc.standbyMode();
 }
 
 void alarmMatch() {
-    
+    Serial.println(":: wake");
 }
 
 void delayStartup() {

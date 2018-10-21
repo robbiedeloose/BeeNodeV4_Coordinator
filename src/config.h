@@ -3,7 +3,7 @@
 
 #include <arduino.h>
 
-#define SerialMon Serial
+#define SerialMon SerialUSB
 #define SerialAT Serial1
 
 #define CONTAINS_REFERENCE_SCALE
