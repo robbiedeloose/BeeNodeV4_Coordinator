@@ -1,22 +1,22 @@
 #include "gprs.h"
 
-  #define TINY_GSM_MODEM_SIM800
-  #include <TinyGsmClient.h>
-  #include <PubSubClient.h>
-  // Your GPRS credentials
-  const char apn[] = "hologram";
-  const char user[] = "";
-  const char pass[] = "";
-  // Server details
-  const char *broker = "m20.cloudmqtt.com";
-  const uint16_t mqttPort = 15913;
-  const char *mqttUser = "oseiokpx";
-  const char *mqttPswd = "31IMHCdWxVVt";
+#define TINY_GSM_MODEM_SIM800
+#include <TinyGsmClient.h>
+#include <PubSubClient.h>
+// Your GPRS credentials
+const char apn[] = "hologram";
+const char user[] = "";
+const char pass[] = "";
+// Server details
+const char *broker = "m20.cloudmqtt.com";
+const uint16_t mqttPort = 15913;
+const char *mqttUser = "oseiokpx";
+const char *mqttPswd = "31IMHCdWxVVt";
 
-  TinyGsm modem(SerialAT);
-  TinyGsmClient client(modem);
-  PubSubClient mqtt(client);
-  char mqttClient[17] = "";
+TinyGsm modem(SerialAT);
+TinyGsmClient client(modem);
+PubSubClient mqtt(client);
+char mqttClient[17] = "";
 
 /* MQTT */
 void mqttInit(char* coordinatorAddressString) {
@@ -107,24 +107,24 @@ void gprsEnd() {
   SerialMon.println(" Disconnected");
 }
 
+void gprsPushPowerButton(unsigned long milliseconds) {  
+  digitalWrite(GSM_RESET_PIN, LOW);
+  delay(milliseconds); // should replace this with a 1,5s sleep
+  digitalWrite(GSM_RESET_PIN, HIGH);
+}
+
 uint8_t gprsPowerOn(uint8_t powerstate) {
-    Serial.println(":: gprsPowerOn");
-    if (powerstate == 0){
-      // pull powerbutton low for 1,5 sec
-      digitalWrite(GSM_RESET_PIN, LOW);
-      delay(1500); // should replace this with a 1,5s sleep
-      digitalWrite(GSM_RESET_PIN, HIGH);
-    }
-    return 1;
+  Serial.println(":: gprsPowerOn");
+  if (powerstate == 0) {
+    gprsPushPowerButton(1500);
+  }
+  return 1;
 }
 
 uint8_t gprsPowerOff(uint8_t powerstate) {
-    Serial.println(":: gprsPowerOff");
-    if (powerstate == 1){
-      // pull powerbutton low for 1,5 sec
-      digitalWrite(GSM_RESET_PIN, LOW);
-      delay(1500); // should replace this with a 1,5s sleep
-      digitalWrite(GSM_RESET_PIN, HIGH);
-    }
-    return 0;
+  Serial.println(":: gprsPowerOff");
+  if (powerstate == 1) {
+    gprsPushPowerButton(1500);
+  }
+  return 0;
 }
