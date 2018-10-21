@@ -51,7 +51,7 @@ void mqttSendData(LocalData_t *local) {
     sprintf(buf, "%s,%i,%u,%d,%u", mqttClient, local->baseTemp, local->baseHum, local->baseLux, local->baseBat);
     SerialMon.println(buf);
     mqtt.publish("c/d", buf);
-    sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, local->weights[0], local->weights[1], local->weights[2], local->weights[3], local->weights[4], local->weights[5], local->weights[6], local->weights[7], local->weights[8]);
+    sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, local->weights[0], local->weights[1], local->weights[2], local->weights[3], local->weights[4], local->weights[5]);
     SerialMon.println(buf);
     mqtt.publish("c/s", buf);
   }  
