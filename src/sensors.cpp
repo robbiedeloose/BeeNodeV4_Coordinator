@@ -41,19 +41,16 @@ void getWeatherData(LocalData_t *local) {
   SerialMon.println("done");
 }
 
-void getSingleScaleData(LocalData_t *local, size_t num, HX711 *scale) {
-  SerialMon.print(num);
-  SerialMon.print(", ");
-  local->weights[num] = scale->get_value(SCALE_SAMPLE_RATE);
-}
-
 void getScaleData(LocalData_t *local) {
   HX711 scales[] = {scale1, scale2, scale3, scale4, scale5, scale6};
   SerialMon.print(":: getScaleData - ");
-  for(size_t index, index < scales.size(), index++) {
-    getSingleScaleData(local, index, scales[index]);
+  for(size_t num; num < scales.size(); num++) {
+    SerialMon.print(num);
+    SerialMon.print(", ");
+    local->weights[num] = scales[num].get_value(SCALE_SAMPLE_RATE);
   }
-  getSingleScaleData(local, index, scalesRef);
+  SerialMon.print("ref, ");
+  local->refWeight = scaleRef.get_value(SCALE_SAMPLE_RATE);
   SerialMon.println("done");
 }
 
