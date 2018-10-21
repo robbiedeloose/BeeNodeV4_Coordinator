@@ -33,11 +33,10 @@ void setup() {
   digitalWrite(LED_BUILTIN, HIGH);
   displayCoordinatorData(coordinatorAddressString);  
   // init communications
-  if (digitalRead(SLEEP_ENABLED) == LOW){
+  if (digitalRead(SLEEP_ENABLED) == LOW) {
     sleepEnabled = true;
     SerialMon.println(":::: Sleep Enabled");
-  } 
-  else {
+  } else {
     sleepEnabled = false;
     SerialMon.println(":::: Sleep Disabled");
   }
@@ -58,7 +57,7 @@ void loop() {
   LocalData_t localData;
 
   // set new alarm
-   if (sleepEnabled){
+   if (sleepEnabled) {
     setRtcAlarm(SLEEPTIMER);
    }
   // collect
@@ -71,12 +70,11 @@ void loop() {
   mqttSendData(&localData);
   powerState = gprsPowerOff(powerState);
   // sleep
-  if (sleepEnabled){
+  if (sleepEnabled) {
     SerialMon.println(":: Sleep");
     digitalWrite(LED_BUILTIN, LOW);
     sleepCoordinator();
-  } 
-  else {
+  } else {
     SerialMon.println(":: Wait");
     digitalWrite(LED_BUILTIN, LOW);
     delay(DELAY_TIMER);
