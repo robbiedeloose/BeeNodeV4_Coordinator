@@ -21,7 +21,7 @@ void alarmMatch() {
 }
 
 void delayStartup() {
-   /***** IMPORTANT DELAY FOR CODE UPLOAD BEFORE USB PORT DETACH DURING SLEEP *****/
+  /***** IMPORTANT DELAY FOR CODE UPLOAD BEFORE USB PORT DETACH DURING SLEEP *****/
   for(uint8_t i = 0; i < (STARTDELAY*2)+1; i++) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
     SerialMon.print(".");

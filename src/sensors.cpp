@@ -20,44 +20,44 @@ HX711 scale6(SCALE_6_DATA, SCALE_6_CLOCK);
 HX711 scaleRef(SCALE_REF_DATA, SCALE_REF_CLOCK); 
 
 void initSensors() {
-    myHumidity.begin();
-    lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
+  myHumidity.begin();
+  lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
 }
 
 void getCoordinatorData(LocalData_t *local) {
   SerialMon.print(":: getCoordinatorData - ");
   local->baseBat = analogRead(A5)*4.3;
-      SerialMon.println("done");
+  SerialMon.println("done");
 }
 
 void getWeatherData(LocalData_t *local) {
-    SerialMon.print(":: getWeatherData - ");
-    SerialMon.print("temp, ");
-    local->baseTemp = myHumidity.readTemperature() * 100;
-    SerialMon.print("hum, ");
-    local->baseHum = myHumidity.readHumidity() * 100;
-    SerialMon.print("lux, ");
-    local->baseLux = lightMeter.readLightLevel();
-    SerialMon.println("done");
+  SerialMon.print(":: getWeatherData - ");
+  SerialMon.print("temp, ");
+  local->baseTemp = myHumidity.readTemperature() * 100;
+  SerialMon.print("hum, ");
+  local->baseHum = myHumidity.readHumidity() * 100;
+  SerialMon.print("lux, ");
+  local->baseLux = lightMeter.readLightLevel();
+  SerialMon.println("done");
 }
 
 void getScaleData(LocalData_t *local) {
-    SerialMon.print(":: getScaleData - ");
-    SerialMon.print("1, ");
-    local->weights[0] = scale1.get_value(SCALE_SAMPLE_RATE);
-    SerialMon.print("2, ");
-    local->weights[1] = scale2.get_value(SCALE_SAMPLE_RATE);
-    SerialMon.print("3, ");
-    local->weights[2] = scale3.get_value(SCALE_SAMPLE_RATE);
-    SerialMon.print("4, ");
-    local->weights[3] = scale4.get_value(SCALE_SAMPLE_RATE);
-    SerialMon.print("5, ");
-    local->weights[4] = scale5.get_value(SCALE_SAMPLE_RATE);
-    SerialMon.print("6, ");
-    local->weights[5] = scale6.get_value(SCALE_SAMPLE_RATE);
-    SerialMon.print("ref, ");
-    local->refWeight = scaleRef.get_value(SCALE_SAMPLE_RATE);
-    SerialMon.println("done");
+  SerialMon.print(":: getScaleData - ");
+  SerialMon.print("1, ");
+  local->weights[0] = scale1.get_value(SCALE_SAMPLE_RATE);
+  SerialMon.print("2, ");
+  local->weights[1] = scale2.get_value(SCALE_SAMPLE_RATE);
+  SerialMon.print("3, ");
+  local->weights[2] = scale3.get_value(SCALE_SAMPLE_RATE);
+  SerialMon.print("4, ");
+  local->weights[3] = scale4.get_value(SCALE_SAMPLE_RATE);
+  SerialMon.print("5, ");
+  local->weights[4] = scale5.get_value(SCALE_SAMPLE_RATE);
+  SerialMon.print("6, ");
+  local->weights[5] = scale6.get_value(SCALE_SAMPLE_RATE);
+  SerialMon.print("ref, ");
+  local->refWeight = scaleRef.get_value(SCALE_SAMPLE_RATE);
+  SerialMon.println("done");
 }
 
 void showLocalData(LocalData_t *local) {
