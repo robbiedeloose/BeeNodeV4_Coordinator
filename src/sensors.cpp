@@ -54,28 +54,22 @@ void getScaleData(LocalData_t *local) {
   SerialMon.println("done");
 }
 
+void printLocalDataItem(const char[] label, const char[] value) {
+  SerialMon.print(label);
+  SerialMon.println(value);
+}
+
 void showLocalData(LocalData_t *local) {
   SerialMon.println(":: showLocalData ::");
-  SerialMon.print("Temp:\t");
-  SerialMon.println(local->baseTemp);
-  SerialMon.print("Hum:\t");
-  SerialMon.println(local->baseHum);
-  SerialMon.print("Lux:\t");
-  SerialMon.println(local->baseLux);
-  SerialMon.print("Bat:\t");
-  SerialMon.println(local->baseBat);
-  SerialMon.print("Scale1: ");
-  SerialMon.println(local->weights[0]);
-  SerialMon.print("Scale2: ");
-  SerialMon.println(local->weights[1]);
-  SerialMon.print("Scale3: ");
-  SerialMon.println(local->weights[2]);
-  SerialMon.print("Scale4: ");
-  SerialMon.println(local->weights[3]);
-  SerialMon.print("Scale5: ");
-  SerialMon.println(local->weights[4]);
-  SerialMon.print("Scale6: ");
-  SerialMon.println(local->weights[5]);
-  SerialMon.print("ScaleRef: ");
-  SerialMon.println(local->refWeight);
+  printLocalDataItem("Temp:\t", local->baseTemp);
+  printLocalDataItem("Hum:\t", local->baseHum);
+  printLocalDataItem("Lux:\t", local->baseLux);
+  printLocalDataItem("Bat:\t", local->baseBat);
+  printLocalDataItem("Scale1:\t", local->weights[0]);
+  printLocalDataItem("Scale2:\t", local->weights[1]);
+  printLocalDataItem("Scale3:\t", local->weights[2]);
+  printLocalDataItem("Scale4:\t", local->weights[3]);
+  printLocalDataItem("Scale5:\t", local->weights[4]);
+  printLocalDataItem("Scale6:\t", local->weights[5]);
+  printLocalDataItem("ScaleRef:\t", local->refWeight);
 }
