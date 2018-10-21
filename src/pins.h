@@ -5,8 +5,8 @@
 
 
 ///////////////////////// PIN DEFINES //////////////////////////////////////////
-#define flashChipCSPin 4
-#define buildInLed 13
+#define flashChipCSPin  4
+#define buildInLed      13
 
 #define GSM_RESET_PIN 3
 
