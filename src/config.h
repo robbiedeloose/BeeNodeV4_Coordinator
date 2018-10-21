@@ -4,7 +4,7 @@
 #include <arduino.h>
 
 #define SerialMon SerialUSB
-#define SerialAT Serial
+#define SerialAT Serial1
 
 #define CONTAINS_REFERENCE_SCALE
 #define SCALE_SAMPLE_RATE 10

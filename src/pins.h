@@ -8,7 +8,7 @@
 #define flashChipCSPin 4
 #define buildInLed 13
 
-#define GSM_RESET_PIN 38
+#define GSM_RESET_PIN 3
 
 #define SCALE_1_CLOCK 7  // wit-blauw 
 #define SCALE_1_DATA 8   // blauw
@@ -19,13 +19,13 @@
 
 #define SCALE_4_CLOCK 5 //0  // geel
 #define SCALE_4_DATA 6 //1   // blauw
-#define SCALE_5_CLOCK 15 // geel
-#define SCALE_5_DATA 16  // blauw
-#define SCALE_6_CLOCK 17 //A3 // geel
-#define SCALE_6_DATA 18 //A4  // blauw
+#define SCALE_5_CLOCK 14 // geel
+#define SCALE_5_DATA 15  // blauw
+#define SCALE_6_CLOCK 16 //A3 // geel
+#define SCALE_6_DATA 17 //A4  // blauw
 
-#define SCALE_REF_CLOCK 2 // geel
-#define SCALE_REF_DATA 3 // blauw
+#define SCALE_REF_CLOCK 18 // geel
+#define SCALE_REF_DATA 38 // blauw
 
  struct LocalData_t {
     int16_t baseTemp;

@@ -58,6 +58,7 @@ void loop() {
   gprsPowerOff(powerState);
   // sleep
   #ifdef DEBUG
+  SerialMon.println(":: Wait");
     digitalWrite(LED_BUILTIN, LOW);
     delay(DELAY_TIMER);
   #else
