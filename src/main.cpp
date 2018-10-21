@@ -31,10 +31,10 @@ void setup() {
   // Display information to SerialMon
   displayCoordinatorData(coordinatorAddressString);  
   // init communications
-  gprsPowerOn(powerState);
+  powerState = gprsPowerOn(powerState);
   mqttInit(coordinatorAddressString);
-  //mqttRegister();
-  gprsPowerOff(powerState);
+  mqttRegister(coordinatorAddressString);
+  //powerState = gprsPowerOff(powerState);
   // Init sensors
   initSensors();
   delay(2000); // let all initialisations run out
@@ -53,15 +53,16 @@ void loop() {
   getScaleData(&localData);
   showLocalData(&localData);
   // send
-  gprsPowerOn(powerState);
-  //mqttSendData(&localData);
-  gprsPowerOff(powerState);
+  powerState = gprsPowerOn(powerState);
+  mqttSendData(&localData);
+  powerState = gprsPowerOff(powerState);
   // sleep
   #ifdef DEBUG
   SerialMon.println(":: Wait");
     digitalWrite(LED_BUILTIN, LOW);
     delay(DELAY_TIMER);
   #else
+    setRtcAlarm(15);
     sleepCoordinator();
   #endif
 }

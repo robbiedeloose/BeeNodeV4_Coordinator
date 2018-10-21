@@ -114,38 +114,18 @@ void gprsPushPowerButton(unsigned long milliseconds) {
 }
 
 uint8_t gprsPowerOn(uint8_t powerstate) {
-<<<<<<< HEAD
-    SerialMon.println(":: gprsPowerOn");
-    if (powerstate == 0){
-      // pull powerbutton low for 1,5 sec
-      digitalWrite(GSM_RESET_PIN, LOW);
-      delay(1500); // should replace this with a 1,5s sleep
-      digitalWrite(GSM_RESET_PIN, HIGH);
-    }
-    return 1;
-}
-
-uint8_t gprsPowerOff(uint8_t powerstate) {
-    SerialMon.println(":: gprsPowerOff");
-    if (powerstate == 1){
-      delay(1500); // should replace this with a 1,5s sleep
-      digitalWrite(GSM_RESET_PIN, HIGH);
-    }
-    return 0;
-}
-=======
-  Serial.println(":: gprsPowerOn");
+  SerialMon.println(":: gprsPowerOn");
   if (powerstate == 0) {
     gprsPushPowerButton(1500);
   }
+  delay(2000);
   return 1;
 }
 
 uint8_t gprsPowerOff(uint8_t powerstate) {
-  Serial.println(":: gprsPowerOff");
+  SerialMon.println(":: gprsPowerOff");
   if (powerstate == 1) {
     gprsPushPowerButton(1500);
   }
   return 0;
 }
->>>>>>> 107089faa882bdb70f7d867a2b775d1ad62eea7c
