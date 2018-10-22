@@ -32,7 +32,7 @@ void setup() {
   // Display information to SerialMon
   digitalWrite(LED_BUILTIN, HIGH);
   displayCoordinatorData(coordinatorAddressString);  
-  // init communications
+  
   if (digitalRead(SLEEP_ENABLED) == LOW) {
     sleepEnabled = true;
     SerialMon.println(":::: Sleep Enabled");
@@ -40,11 +40,15 @@ void setup() {
     sleepEnabled = false;
     SerialMon.println(":::: Sleep Disabled");
   }
-  powerState = gprsPowerOn(powerState);
-  initRtc();
-  mqttInit(coordinatorAddressString);
-  mqttRegister(coordinatorAddressString);
-  //powerState = gprsPowerOff(powerState);
+
+  // init communications
+  if (SCALE_CALIBRATION != true){
+    powerState = gprsPowerOn(powerState);
+    initRtc();
+    mqttInit(coordinatorAddressString);
+    mqttRegister(coordinatorAddressString);
+    //powerState = gprsPowerOff(powerState);
+  }
   // Init sensors
   initSensors();
   digitalWrite(LED_BUILTIN, LOW);
@@ -52,10 +56,16 @@ void setup() {
 }
 
 void loop() {
-  SerialMon.println(":: Main : Loop");
+  SerialMon.println(":: Loop");
   digitalWrite(LED_BUILTIN, HIGH);
   LocalData_t localData;
 
+  if (SCALE_CALIBRATION == true){
+    while (true){
+      getScaleData(&localData, 10);
+      showScaleCalibration(&localData);
+    }
+  }
   // set new alarm
    if (sleepEnabled) {
     setRtcAlarm(SLEEPTIMER);
@@ -63,7 +73,7 @@ void loop() {
   // collect
   getCoordinatorData(&localData);
   getWeatherData(&localData);
-  getScaleData(&localData);
+  getScaleData(&localData, SCALE_SAMPLE_RATE);
   showLocalData(&localData);
   // send
   powerState = gprsPowerOn(powerState);

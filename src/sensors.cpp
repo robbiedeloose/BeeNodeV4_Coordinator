@@ -17,7 +17,7 @@ HX711 scale3(SCALE_3_DATA, SCALE_3_CLOCK);
 HX711 scale4(SCALE_4_DATA, SCALE_4_CLOCK); 
 HX711 scale5(SCALE_5_DATA, SCALE_5_CLOCK); 
 HX711 scale6(SCALE_6_DATA, SCALE_6_CLOCK); 
-HX711 scaleRef(SCALE_REF_DATA, SCALE_REF_CLOCK);
+//HX711 scaleRef(SCALE_REF_DATA, SCALE_REF_CLOCK);
 
 void initSensors() {
   myHumidity.begin();
@@ -41,17 +41,23 @@ void getWeatherData(LocalData_t *local) {
   SerialMon.println("done");
 }
 
-void getScaleData(LocalData_t *local) {
+void getScaleData(LocalData_t *local, uint8_t numberOfReads) {
   HX711 scales[] = {scale1, scale2, scale3, scale4, scale5, scale6};
-  SerialMon.print(":: getScaleData - ");
-  for(size_t num = 0; num < 6; num++) {
-    SerialMon.print(num);
-    SerialMon.print(", ");
-    local->weights[num] = scales[num].get_value(SCALE_SAMPLE_RATE);
+  if (SCALE_CALIBRATION != true){
+    SerialMon.print(":: getScaleData - ");
   }
-  SerialMon.print("ref, ");
-  local->refWeight = scaleRef.get_value(SCALE_SAMPLE_RATE);
-  SerialMon.println("done");
+  for(size_t num = 0; num < 6; num++) {
+    if (SCALE_CALIBRATION != true){
+      SerialMon.print(num);
+      SerialMon.print(", ");
+    }
+    local->weights[num] = scales[num].get_value(numberOfReads);
+  }
+  //SerialMon.print("ref, ");
+  //local->refWeight = scaleRef.get_value(numberOfReads);
+  if (SCALE_CALIBRATION != true){
+    SerialMon.println("done");
+  }
 }
 
 void showLocalData(LocalData_t *local) {
@@ -78,4 +84,13 @@ void showLocalData(LocalData_t *local) {
   SerialMon.println(local->weights[5]);
   SerialMon.print("ScaleRef: ");
   SerialMon.println(local->refWeight);
+}
+
+void showScaleCalibration(LocalData_t *local) {
+  for(size_t index = 0; index < 6; index++)
+  {
+    SerialMon.print(local->weights[index]);
+    SerialMon.print("\t");
+  }
+  SerialMon.println();
 }

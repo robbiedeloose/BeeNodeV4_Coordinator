@@ -37,3 +37,7 @@ void delayStartup() {
   }
   SerialMon.println();
 }
+
+void checkSleepEnabled(){
+
+}

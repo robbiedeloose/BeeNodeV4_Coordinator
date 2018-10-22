@@ -21,5 +21,6 @@ void setRtcAlarm(uint8_t alarmMinutes);
 void sleepCoordinator();
 void alarmMatch();
 void delayStartup();
+void checkSleepEnabled();
 
 #endif
