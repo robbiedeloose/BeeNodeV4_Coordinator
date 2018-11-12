@@ -93,4 +93,5 @@ void showScaleCalibration(LocalData_t *local) {
     SerialMon.print("\t");
   }
   SerialMon.println();
+  delay(5000);
 }

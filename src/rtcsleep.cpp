@@ -9,12 +9,13 @@ void initRtc() {
 }
 
 void setRtcAlarm(uint8_t alarmMinutes) {
-  SerialMon.print(":: setRtcAlarm - ");
+  SerialMon.print(":: setRtcAlarm - next: ");
   rtc.setAlarmSeconds(00);
   rtc.setAlarmMinutes((rtc.getMinutes()+alarmMinutes)%60);
+  SerialMon.print(rtc.getMinutes()+alarmMinutes)%60);
   rtc.enableAlarm(rtc.MATCH_MMSS);
   rtc.attachInterrupt(alarmMatch);
-  SerialMon.println("done");
+  SerialMon.println(" done");
 }
 
 void sleepCoordinator() {

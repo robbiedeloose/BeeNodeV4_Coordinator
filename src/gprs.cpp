@@ -35,6 +35,7 @@ void mqttRegister(char* coordinatorAddressString) {
   SerialMon.println(":: mqttRegsister");
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
+    delay(100);
     mqtt.publish("c/r", mqttClient);
   }
   mqtt.disconnect();

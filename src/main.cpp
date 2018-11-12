@@ -48,6 +48,7 @@ void setup() {
     mqttInit(coordinatorAddressString);
     mqttRegister(coordinatorAddressString);
     //powerState = gprsPowerOff(powerState);
+    //delay(1000);
   }
   // Init sensors
   initSensors();
@@ -66,10 +67,9 @@ void loop() {
       showScaleCalibration(&localData);
     }
   }
+
   // set new alarm
-   if (sleepEnabled) {
-    setRtcAlarm(SLEEPTIMER);
-   }
+  setRtcAlarm(SLEEPTIMER); 
   // collect
   getCoordinatorData(&localData);
   getWeatherData(&localData);
@@ -82,6 +82,11 @@ void loop() {
   // sleep
   if (sleepEnabled) {
     SerialMon.println(":: Sleep");
+    for(size_t i = 0; i < 10; i++)
+    {
+      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+      delay(100);
+    }
     digitalWrite(LED_BUILTIN, LOW);
     sleepCoordinator();
   } else {
@@ -89,5 +94,4 @@ void loop() {
     digitalWrite(LED_BUILTIN, LOW);
     delay(DELAY_TIMER);
   }
-
 }
