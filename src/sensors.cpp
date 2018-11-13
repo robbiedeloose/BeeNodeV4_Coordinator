@@ -44,13 +44,14 @@ void getWeatherData(LocalData_t *local) {
 void getScaleData(LocalData_t *local, uint8_t numberOfReads) {
   HX711 scales[] = {scale1, scale2, scale3, scale4, scale5, scale6};
   SerialMon.print(F(":: getScaleData - "));
+  // fill with some data
   for(size_t num = 0; num < 6; num++) {
     SerialMon.print(num);
     SerialMon.print(F(", "));
-    local->weights[num] = scales[num].get_value(numberOfReads);
+    local->weights[num] = 7654321;//scales[num].get_value(numberOfReads);
   }
-  //SerialMon.print("ref, ");
-  //local->refWeight = scaleRef.get_value(numberOfReads);
+  // get one real scale
+  local->weights[0] = scales[0].get_value(numberOfReads);
   SerialMon.println(F("done")); 
 }
 
@@ -76,6 +77,4 @@ void showLocalData(LocalData_t *local) {
   SerialMon.println(local->weights[4]);
   SerialMon.print(F("Scale6: "));
   SerialMon.println(local->weights[5]);
-  SerialMon.print(F("ScaleRef: "));
-  SerialMon.println(local->refWeight);
 }

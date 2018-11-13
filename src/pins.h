@@ -35,7 +35,6 @@ struct LocalData_t {
   uint16_t baseLux;
   uint16_t baseBat;
   long int weights[6];
-  long int refWeight;
 };
 
 void setPinModes();

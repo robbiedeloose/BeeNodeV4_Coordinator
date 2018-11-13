@@ -22,7 +22,7 @@ void setup() {
   Wire.begin();
   SerialMon.begin(115200);
   SerialAT.begin(115200);
-  delay(3000);
+  //delay(3000);
   // Init SerialMon flash
   initFlash();
   // Get id
@@ -41,13 +41,14 @@ void setup() {
     SerialMon.println(":::: Sleep Disabled");
   }
 
+  //init RTC
+  initRtc();
   // init communications
   powerState = gprsPowerOn(powerState);
-  initRtc();
   mqttInit(coordinatorAddressString);
   mqttRegister(coordinatorAddressString);
-  //powerState = gprsPowerOff(powerState);
-  //delay(1000);
+  powerState = gprsPowerOff(powerState);
+  delay(1000);
 
   // Init sensors
   initSensors();
@@ -65,7 +66,7 @@ void loop() {
   // collect
   getCoordinatorData(&localData);
   getWeatherData(&localData);
-  //getScaleData(&localData, SCALE_SAMPLE_RATE);
+  getScaleData(&localData, SCALE_SAMPLE_RATE);
   showLocalData(&localData);
   // send
   powerState = gprsPowerOn(powerState);

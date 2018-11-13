@@ -28,7 +28,6 @@ void sleepCoordinator() {
 }
 
 void alarmMatch() {
-  Serial.println(F(F(":: wake")));
 }
 
 void delayStartup() {

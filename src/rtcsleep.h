@@ -9,7 +9,7 @@
 
 /* Change these values to set the current initial time */
 const uint8_t seconds = 0;
-const uint8_t minutes = 57;
+const uint8_t minutes = 0;
 const uint8_t hours = 10;
 /* Change these values to set the current initial date */
 const uint8_t day = 20;
