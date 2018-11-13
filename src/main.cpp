@@ -42,14 +42,13 @@ void setup() {
   }
 
   // init communications
-  if (SCALE_CALIBRATION != true){
-    powerState = gprsPowerOn(powerState);
-    initRtc();
-    mqttInit(coordinatorAddressString);
-    mqttRegister(coordinatorAddressString);
-    //powerState = gprsPowerOff(powerState);
-    //delay(1000);
-  }
+  powerState = gprsPowerOn(powerState);
+  initRtc();
+  mqttInit(coordinatorAddressString);
+  mqttRegister(coordinatorAddressString);
+  //powerState = gprsPowerOff(powerState);
+  //delay(1000);
+
   // Init sensors
   initSensors();
   digitalWrite(LED_BUILTIN, LOW);
@@ -61,19 +60,12 @@ void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   LocalData_t localData;
 
-  if (SCALE_CALIBRATION == true){
-    while (true){
-      getScaleData(&localData, 10);
-      showScaleCalibration(&localData);
-    }
-  }
-
   // set new alarm
   setRtcAlarm(SLEEPTIMER); 
   // collect
   getCoordinatorData(&localData);
   getWeatherData(&localData);
-  getScaleData(&localData, SCALE_SAMPLE_RATE);
+  //getScaleData(&localData, SCALE_SAMPLE_RATE);
   showLocalData(&localData);
   // send
   powerState = gprsPowerOn(powerState);

@@ -27,12 +27,12 @@ void mqttInit(char* coordinatorAddressString) {
   }
   mqttClient[16] = '\0';
   //mqtt.setCallback(mqttCallback); // we can use this to reply options to CO
-  SerialMon.print("Mqtt Client ID: ");
+  SerialMon.print(F("Mqtt Client ID: "));
   SerialMon.println(mqttClient);
 }
 
 void mqttRegister(char* coordinatorAddressString) {
-  SerialMon.println(":: mqttRegsister");
+  SerialMon.println(F(":: mqttRegsister"));
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
     delay(100);
@@ -40,11 +40,11 @@ void mqttRegister(char* coordinatorAddressString) {
   }
   mqtt.disconnect();
   gprsEnd();
-  SerialMon.println("Registered CO");
+  SerialMon.println(F("Registered CO"));
 }
 
 void mqttSendData(LocalData_t *local) {
-  SerialMon.println(":: mqttSendData");
+  SerialMon.println(F(":: mqttSendData"));
   //gprsResetModem();
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
@@ -69,7 +69,7 @@ void gprsTest() {
 }
 
 void gprsResetModem() {
-  SerialMon.println(":: gprsResetModem");
+  SerialMon.println(F(":: gprsResetModem"));
   modem.restart();
   String modemInfo = modem.getModemInfo();
   SerialMon.print(F(" Modem: "));
@@ -77,7 +77,7 @@ void gprsResetModem() {
 }
 
 void gprsDisplayModemInfo() {
-  SerialMon.println(":: gprsResetModem");
+  SerialMon.println(F(":: gprsResetModem"));
   //modem.restart();
   String modemInfo = modem.getModemInfo();
   SerialMon.print(F(" Modem: "));
@@ -105,7 +105,7 @@ void gprsConnectNetwork() {
 void gprsEnd() {
   modem.gprsDisconnect();
   //gprsPowerOff();
-  SerialMon.println(" Disconnected");
+  SerialMon.println(F(" Disconnected"));
 }
 
 void gprsPushPowerButton(unsigned long milliseconds) {  
@@ -115,7 +115,7 @@ void gprsPushPowerButton(unsigned long milliseconds) {
 }
 
 uint8_t gprsPowerOn(uint8_t powerstate) {
-  SerialMon.println(":: gprsPowerOn");
+  SerialMon.println(F(":: gprsPowerOn"));
   if (powerstate == 0) {
     gprsPushPowerButton(1500);
   }
@@ -124,7 +124,7 @@ uint8_t gprsPowerOn(uint8_t powerstate) {
 }
 
 uint8_t gprsPowerOff(uint8_t powerstate) {
-  SerialMon.println(":: gprsPowerOff");
+  SerialMon.println(F(":: gprsPowerOff"));
   if (powerstate == 1) {
     gprsPushPowerButton(1500);
   }

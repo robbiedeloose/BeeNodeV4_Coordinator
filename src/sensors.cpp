@@ -25,73 +25,57 @@ void initSensors() {
 }
 
 void getCoordinatorData(LocalData_t *local) {
-  SerialMon.print(":: getCoordinatorData - ");
+  SerialMon.print(F(":: getCoordinatorData - "));
   local->baseBat = analogRead(A5)*4.3;
-  SerialMon.println("done");
+  SerialMon.println(F("done"));
 }
 
 void getWeatherData(LocalData_t *local) {
-  SerialMon.print(":: getWeatherData - ");
-  SerialMon.print("temp, ");
+  SerialMon.print(F(":: getWeatherData - "));
+  SerialMon.print(F("temp, "));
   local->baseTemp = myHumidity.readTemperature() * 100;
-  SerialMon.print("hum, ");
+  SerialMon.print(F("hum, "));
   local->baseHum = myHumidity.readHumidity() * 100;
-  SerialMon.print("lux, ");
+  SerialMon.print(F("lux, "));
   local->baseLux = lightMeter.readLightLevel();
-  SerialMon.println("done");
+  SerialMon.println(F("done"));
 }
 
 void getScaleData(LocalData_t *local, uint8_t numberOfReads) {
   HX711 scales[] = {scale1, scale2, scale3, scale4, scale5, scale6};
-  if (SCALE_CALIBRATION != true){
-    SerialMon.print(":: getScaleData - ");
-  }
+  SerialMon.print(F(":: getScaleData - "));
   for(size_t num = 0; num < 6; num++) {
-    if (SCALE_CALIBRATION != true){
-      SerialMon.print(num);
-      SerialMon.print(", ");
-    }
+    SerialMon.print(num);
+    SerialMon.print(F(", "));
     local->weights[num] = scales[num].get_value(numberOfReads);
   }
   //SerialMon.print("ref, ");
   //local->refWeight = scaleRef.get_value(numberOfReads);
-  if (SCALE_CALIBRATION != true){
-    SerialMon.println("done");
-  }
+  SerialMon.println(F("done")); 
 }
 
 void showLocalData(LocalData_t *local) {
-  SerialMon.println(":: showLocalData ::");
-  SerialMon.print("Temp:\t");
+  SerialMon.println(F(":: showLocalData ::"));
+  SerialMon.print(F("Temp:\t"));
   SerialMon.println(local->baseTemp);
-  SerialMon.print("Hum:\t");
+  SerialMon.print(F("Hum:\t"));
   SerialMon.println(local->baseHum);
-  SerialMon.print("Lux:\t");
+  SerialMon.print(F("Lux:\t"));
   SerialMon.println(local->baseLux);
-  SerialMon.print("Bat:\t");
+  SerialMon.print(F("Bat:\t"));
   SerialMon.println(local->baseBat);
-  SerialMon.print("Scale1: ");
+  SerialMon.print(F("Scale1: "));
   SerialMon.println(local->weights[0]);
-  SerialMon.print("Scale2: ");
+  SerialMon.print(F("Scale2: "));
   SerialMon.println(local->weights[1]);
-  SerialMon.print("Scale3: ");
+  SerialMon.print(F("Scale3: "));
   SerialMon.println(local->weights[2]);
-  SerialMon.print("Scale4: ");
+  SerialMon.print(F("Scale4: "));
   SerialMon.println(local->weights[3]);
-  SerialMon.print("Scale5: ");
+  SerialMon.print(F("Scale5: "));
   SerialMon.println(local->weights[4]);
-  SerialMon.print("Scale6: ");
+  SerialMon.print(F("Scale6: "));
   SerialMon.println(local->weights[5]);
-  SerialMon.print("ScaleRef: ");
+  SerialMon.print(F("ScaleRef: "));
   SerialMon.println(local->refWeight);
-}
-
-void showScaleCalibration(LocalData_t *local) {
-  for(size_t index = 0; index < 6; index++)
-  {
-    SerialMon.print(local->weights[index]);
-    SerialMon.print("\t");
-  }
-  SerialMon.println();
-  delay(5000);
 }

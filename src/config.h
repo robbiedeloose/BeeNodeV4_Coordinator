@@ -11,8 +11,7 @@
 #define SLEEPTIMER 2        // how often do we want to send data (in minutes)
 #define STARTDELAY 10       // delay start of programm, needed for reprogamming when using sleep
 #define DEBUG               // comment to use sleep
-#define DELAY_TIMER 60000  
-#define SCALE_CALIBRATION false
+#define DELAY_TIMER 60000   // in miliseconds
 
 void displayCoordinatorData(char* coordinatorAddressString);
 

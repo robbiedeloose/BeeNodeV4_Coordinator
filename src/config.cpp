@@ -2,7 +2,7 @@
 
 void displayCoordinatorData(char* coordinatorAddressString) {
   SerialMon.println(F("BeeNode v4.0.1a"));
-  SerialMon.print("Id: ");
+  SerialMon.print(F("Id: "));
   SerialMon.println(coordinatorAddressString);
 } 
 
