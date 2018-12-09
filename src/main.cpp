@@ -4,88 +4,45 @@
 
 #include <Arduino.h>
 #include "config.h"
-#include "pins.h"
-//#include "readId.h"
-//#include "sensors.h"
-//#include "rtcsleep.h"
-//#include "flash.h"
-//#include "gprs.h"
+#include "flash.h"
+#include "readid.h"
 
+// Global Variables
 char coordinatorAddressString[17] = "";
-uint8_t powerState = 0;
-bool sleepEnabled = false;
 
+// Setup
 void setup() {
-  delay(2000);
-  // Define used pin states and put everything else high
-  //setPinModes();
-  // start serials and Wire
-  //Wire.begin();
+  setPinModes();
+  digitalWrite(LED_BUILTIN, HIGH); // indicate setup is started
+    
+  // Start Wire and Serial
+  Wire.begin();
   SerialMon.begin(115200);
-  //SerialAT.begin(115200);
-  //delay(3000);
-  // Init SerialMon flash
-  //initFlash();
-  // Get id
-  //readIdFromEepRom(coordinatorAddressString);
-  // Delay startup to allow programming
-  //delayStartup();
-  // Display information to SerialMon
-  digitalWrite(LED_BUILTIN, HIGH);
-  //displayCoordinatorData(coordinatorAddressString);  
-  
-  if (digitalRead(SLEEP_ENABLED) == LOW) {
-    sleepEnabled = true;
-    SerialMon.println(":::: Sleep Enabled");
-  } else {
-    sleepEnabled = false;
-    SerialMon.println(":::: Sleep Disabled");
-  }
-
-  //init RTC
-  //initRtc();
-  // init communications
-  //powerState = gprsPowerOn(powerState);
-  //mqttInit(coordinatorAddressString);
-  //mqttRegister(coordinatorAddressString);
-  //powerState = gprsPowerOff(powerState);
+  delay(5000); // Give serial time to start
+  SerialMon.println(":: Setup");
   delay(1000);
+  
+  // external inits
+  SerialMon.print("Init Flash ");
+  initFlash();
+  SerialMon.println("- done");
 
-  // Init sensors
-  //initSensors();
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(2000); // let all initialisations run out
+  // init data
+  SerialMon.print("Get Co Id ");
+  readIdFromEepRom(coordinatorAddressString);
+  SerialMon.println("- done");
+  SerialMon.print("Id: ");
+  SerialMon.println(coordinatorAddressString);
+
+  digitalWrite(LED_BUILTIN, LOW); // indicate setup is done
 }
 
+// Loop
 void loop() {
   SerialMon.println(":: Loop");
   digitalWrite(LED_BUILTIN, HIGH);
-  //LocalData_t localData;
-
-  // set new alarm
-  //setRtcAlarm(SLEEPTIMER); 
-  // collect
-  //getCoordinatorData(&localData);
-  //getWeatherData(&localData);
-  //getScaleData(&localData, SCALE_SAMPLE_RATE);
-  //showLocalData(&localData);
-  // send
-  //powerState = gprsPowerOn(powerState);
-  //mqttSendData(&localData);
-  //powerState = gprsPowerOff(powerState);
-  // sleep
-  //if (sleepEnabled) {
-  //  SerialMon.println(":: Sleep");
-  //  for(size_t i = 0; i < 10; i++)
-  //  {
-  //    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-  //    delay(100);
-  //  }
-  //  digitalWrite(LED_BUILTIN, LOW);
-  //  sleepCoordinator();
-  //} else {
-    SerialMon.println(":: Wait");
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(DELAY_TIMER);
-  //}
+  delay(1000);
+  SerialMon.println(":: Wait");
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(DELAY_TIMER);
 }

@@ -3,6 +3,7 @@
 
 #include <arduino.h>
 #include <wire.h>
+#include "config.h"
 
 void readIdFromEepRom(char* coordinatorAddressString);
 

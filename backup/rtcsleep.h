@@ -4,7 +4,6 @@
 #include <arduino.h>
 #include <RTCZero.h>
   
-#include "pins.h"
 #include "config.h"
 
 /* Change these values to set the current initial time */

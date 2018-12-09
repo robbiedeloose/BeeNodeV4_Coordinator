@@ -4,7 +4,7 @@
 #include <arduino.h>
 #include <SPI.h>
 #include <SerialFlash.h>
-#include "pins.h"
+#include "config.h"
 
 const int flashChipSelect = flashChipCSPin;
 
