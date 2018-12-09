@@ -6,6 +6,7 @@
 #include "config.h"
 #include "flash.h"
 #include "readid.h"
+#include "rtcsleep.h"
 
 // Global Variables
 char coordinatorAddressString[17] = "";
@@ -23,26 +24,29 @@ void setup() {
   delay(1000);
   
   // external inits
-  SerialMon.print("Init Flash ");
   initFlash();
-  SerialMon.println("- done");
+  initRtc();
 
   // init data
-  SerialMon.print("Get Co Id ");
   readIdFromEepRom(coordinatorAddressString);
-  SerialMon.println("- done");
-  SerialMon.print("Id: ");
-  SerialMon.println(coordinatorAddressString);
-
-  digitalWrite(LED_BUILTIN, LOW); // indicate setup is done
+  
+  // indicate setup is done
+  digitalWrite(LED_BUILTIN, LOW); 
 }
 
 // Loop
 void loop() {
   SerialMon.println(":: Loop");
-  digitalWrite(LED_BUILTIN, HIGH);
+  digitalWrite(LED_BUILTIN, HIGH); // indicate loop start
+
+  // Set new alarm
+  setRtcAlarm(SLEEPTIMER);
+
   delay(1000);
+ 
+  digitalWrite(LED_BUILTIN, LOW); // indicate loop start
+  
+  // delay or sleep
   SerialMon.println(":: Wait");
-  digitalWrite(LED_BUILTIN, LOW);
   delay(DELAY_TIMER);
 }
