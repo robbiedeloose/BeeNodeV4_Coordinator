@@ -3,6 +3,8 @@
 
 #include <arduino.h>
 #include <Wire.h>
+#include <BH1750.h>
+#include "SparkFunHTU21D.h"
 #include "config.h"
 
 void initSensors();

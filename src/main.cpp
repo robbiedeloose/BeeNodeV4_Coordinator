@@ -7,6 +7,7 @@
 #include "flash.h"
 #include "readid.h"
 #include "rtcsleep.h"
+#include "sensors.h"
 
 // Global Variables
 char coordinatorAddressString[17] = "";
@@ -26,6 +27,7 @@ void setup() {
   // external inits
   initFlash();
   initRtc();
+  initSensors();
 
   // init data
   readIdFromEepRom(coordinatorAddressString);
@@ -42,9 +44,15 @@ void loop() {
   // Set new alarm
   setRtcAlarm(SLEEPTIMER);
 
+  // create a data object
+  LocalData_t localData;
+  // read sensors
+  getCoordinatorData(&localData);
+  getWeatherData(&localData);
+  showLocalData(&localData);
+
   delay(1000);
- 
-  digitalWrite(LED_BUILTIN, LOW); // indicate loop start
+  digitalWrite(LED_BUILTIN, LOW); // indicate loop stop
   
   // delay or sleep
   SerialMon.println(":: Wait");

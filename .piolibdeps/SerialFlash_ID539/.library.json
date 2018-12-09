@@ -1,9 +1,18 @@
 {
     "name": "SerialFlash", 
+    "keywords": [
+        "serial", 
+        "flash", 
+        "spi"
+    ], 
+    "description": "SerialFlash provides low-latency, high performance access to SPI Flash memory with a filesystem-like interface. Familiar file-based functions, similar to the SD library, are used to access data.", 
     "repository": {
-        "url": "https://github.com/PaulStoffregen/SerialFlash.git", 
-        "type": "git"
+        "type": "git", 
+        "url": "https://github.com/PaulStoffregen/SerialFlash.git"
     }, 
+    "frameworks": [
+        "arduino"
+    ], 
     "platforms": [
         "atmelavr", 
         "atmelsam", 
@@ -17,23 +26,14 @@
         "teensy", 
         "timsp430"
     ], 
-    "frameworks": [
-        "arduino"
-    ], 
-    "version": "a3508c30be", 
+    "version": "71cfa7a738", 
     "authors": [
         {
-            "maintainer": false, 
-            "name": "Paul Stoffregen", 
+            "email": null, 
             "url": "https://github.com/PaulStoffregen", 
-            "email": null
+            "maintainer": false, 
+            "name": "Paul Stoffregen"
         }
     ], 
-    "keywords": [
-        "spi", 
-        "serial", 
-        "flash"
-    ], 
-    "id": 539, 
-    "description": "SerialFlash provides low-latency, high performance access to SPI Flash memory with a filesystem-like interface. Familiar file-based functions, similar to the SD library, are used to access data."
+    "id": 539
 }
