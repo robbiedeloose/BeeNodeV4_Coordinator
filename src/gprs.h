@@ -2,7 +2,6 @@
 #define GPRS_H
 
 #include <arduino.h>
-#include "pins.h"
 #include "config.h"
 
 void gprsTest();
@@ -15,6 +14,6 @@ uint8_t gprsPowerOff(uint8_t powerstate);
 
 void mqttInit(char* coordinatorAddressString);
 void mqttRegister(char* coordinatorAddressString);
-void mqttSendData(LocalData_t *local);
+void mqttSendData(LocalData_t *local,char hiveDataBuffer[6][29]);
 
 #endif

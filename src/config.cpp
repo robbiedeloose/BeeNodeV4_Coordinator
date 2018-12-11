@@ -7,16 +7,20 @@ void displayCoordinatorData(char* coordinatorAddressString) {
 } 
 
 void setPinModes() {
+  // Battery monitor
   pinMode(A5,INPUT);
-  //led
+  // Led
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
-  //gprssleep
+  // Gprssleep
   pinMode(GSM_RESET_PIN, OUTPUT);
   digitalWrite(GSM_RESET_PIN, HIGH);
-  //sleep enable
+  // Sleep enable
   pinMode(SLEEP_ENABLED, INPUT_PULLUP);
   digitalWrite(SLEEP_ENABLED, HIGH);
+  // Wake reciever
+  pinMode(WAKE_RECIEVER, OUTPUT);
+  digitalWrite(WAKE_RECIEVER, HIGH);
 }
 
 

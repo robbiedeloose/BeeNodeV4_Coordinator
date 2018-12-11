@@ -11,7 +11,7 @@
 #define SLEEPTIMER 1        // how often do we want to send data (in minutes)
 #define STARTDELAY 10       // delay start of programm, needed for reprogamming when using sleep
 #define DEBUG               // comment to use sleep
-#define DELAY_TIMER 10000   // in miliseconds
+#define DELAY_TIMER 125000   // in miliseconds
 
 ///////////////////////// PIN DEFINES //////////////////////////////////////////
 #define flashChipCSPin  4
@@ -33,8 +33,7 @@
 #define SCALE_6_CLOCK 16  //A3  // geel
 #define SCALE_6_DATA  17  //A4  // blauw
 
-#define SCALE_REF_CLOCK 18  // geel
-#define SCALE_REF_DATA  38  // blauw
+#define WAKE_RECIEVER 18
 
 #define SLEEP_ENABLED 2
 
