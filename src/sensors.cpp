@@ -44,13 +44,13 @@ void getWeatherData(LocalData_t *local) {
 
 void showLocalData(LocalData_t *local) {
   SerialMon.println(F(":: showLocalData ::"));
-  SerialMon.print(F("Temp:\t"));
+  SerialMon.print(F("- Temp:\t"));
   SerialMon.println(local->baseTemp);
-  SerialMon.print(F("Hum:\t"));
+  SerialMon.print(F("- Hum:\t"));
   SerialMon.println(local->baseHum);
-  SerialMon.print(F("Lux:\t"));
+  SerialMon.print(F("- Lux:\t"));
   SerialMon.println(local->baseLux);
-  SerialMon.print(F("Bat:\t"));
+  SerialMon.print(F("- Bat:\t"));
   SerialMon.println(local->baseBat);
   /*SerialMon.print(F("Scale1: "));
   SerialMon.println(local->weights[0]);

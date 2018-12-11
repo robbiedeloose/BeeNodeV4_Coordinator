@@ -8,7 +8,14 @@ void getDataFromReciever(){
   delay(100);
   //SerialMon.println("high");
   digitalWrite(WAKE_RECIEVER, HIGH);
-  delay(5000);
+  SerialMon.print("wating for responce");
+  
+  for(size_t i = 0; i < 5; i++)
+  {
+    delay(1000);
+    SerialMon.print("."); 
+  }
+  SerialMon.println();
 
   //make 6 requests to get all plBuffer data
   for(size_t i = 0; i < 6; i++)
@@ -27,21 +34,23 @@ void getDataFromReciever(){
     buf[28] = '\0';
     if(buf[18] != '0') {
       SerialMon.println(buf);
+      
+      char hive_id[9];
+      int hive_temp = 0;
+      int hive_hum = 0;
+      int hive_bat = 0;
+      int hive_weight = 0;
+      sscanf(buf, "%8s,%4d,%3d,%3d,%6d", hive_id, &hive_temp, &hive_hum, &hive_bat, &hive_weight );
+      SerialMon.print("- temp: ");
+      SerialMon.println(hive_temp);
+      SerialMon.print("- hum: ");
+      SerialMon.println(hive_hum);
+      SerialMon.print("- bat: ");
+      SerialMon.println(hive_bat);
+      SerialMon.print("- id: ");
+      SerialMon.println(hive_id);
+      SerialMon.print("- weight: ");
+      SerialMon.println(hive_weight);
     }
-    /*char id[9];
-    int temp = 0;
-    int hum = 0;
-    int bat = 0;
-    int weight = 0;
-    sscanf(buf, "%8s%4d%3d%3d%6d", id, &temp, &hum, &bat, &weight );
-    Serial.print("temp: ");
-    Serial.println(temp);
-    Serial.print("hum: ");
-    Serial.println(hum);
-    Serial.print("bat: ");
-    Serial.println(bat);
-    Serial.print("id: ");
-    Serial.println(id);
-    */
   }
 }
