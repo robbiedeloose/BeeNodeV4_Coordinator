@@ -12,6 +12,7 @@
 #define STARTDELAY 10       // delay start of programm, needed for reprogamming when using sleep
 #define DEBUG               // comment to use sleep
 #define DELAY_TIMER 125000   // in miliseconds
+#define HIVE_BUFFER 6
 
 ///////////////////////// PIN DEFINES //////////////////////////////////////////
 #define flashChipCSPin  4
@@ -43,6 +44,14 @@ struct LocalData_t {
   uint16_t baseLux;
   uint16_t baseBat;
   long int weights[6];
+};
+
+struct HiveData_t {
+  char id[6][9];
+  int temp[6];
+  int hum[6];
+  int bat[6];
+  int weight[6];
 };
 
 void setPinModes();

@@ -13,7 +13,6 @@
 
 // Global Variables
 char coordinatorAddressString[17] = "";
-char hiveDataBuffer[6][29];
 
 // Setup
 void setup() {
@@ -40,6 +39,8 @@ void setup() {
   mqttInit(coordinatorAddressString);
   gprsResetModem(); // change by poweron
   mqttRegister(coordinatorAddressString);
+
+  
   
   // indicate setup is done
   digitalWrite(LED_BUILTIN, LOW); 
@@ -55,14 +56,18 @@ void loop() {
 
   // create a data object
   LocalData_t localData;
+  HiveData_t hiveDataBuffer;
+  clearHiveBuffer(&hiveDataBuffer);
+
   // read sensors
   getCoordinatorData(&localData);
   getWeatherData(&localData);
-  getDataFromReciever();
+  getDataFromReciever(&hiveDataBuffer);
   // show data
   showLocalData(&localData);
+  displayHiveBuffer(&hiveDataBuffer);
   // send data
-  mqttSendData(&localData, hiveDataBuffer);
+  mqttSendData(&localData, &hiveDataBuffer);
 
   delay(1000);
   digitalWrite(LED_BUILTIN, LOW); // indicate loop stop

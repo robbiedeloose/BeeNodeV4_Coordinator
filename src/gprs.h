@@ -14,6 +14,6 @@ uint8_t gprsPowerOff(uint8_t powerstate);
 
 void mqttInit(char* coordinatorAddressString);
 void mqttRegister(char* coordinatorAddressString);
-void mqttSendData(LocalData_t *local,char hiveDataBuffer[6][29]);
+void mqttSendData(LocalData_t *local, HiveData_t *hive);
 
 #endif
