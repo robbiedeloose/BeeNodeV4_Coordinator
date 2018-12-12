@@ -1,6 +1,4 @@
-#include <arduino.h>
 #include "sensors.h"
-#include "config.h"
 
 HTU21D myHumidity;
 
