@@ -40,29 +40,18 @@ void mqttRegister(char* coordinatorAddressString) {
   }
   mqtt.disconnect();
   gprsEnd();
-  SerialMon.println(F(" -- Registered CO"));
+  SerialMon.println(F("Registered CO"));
 }
 
-void mqttSendData(LocalData_t *local, HiveData_t *hive) {
+void mqttSendData(LocalData_t *local) {
   SerialMon.println(F(":: mqttSendData"));
   //gprsResetModem();
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
     char buf[120] = "";
-    SerialMon.println(F("Sending co Data"));
     sprintf(buf, "%s,%i,%u,%d,%u", mqttClient, local->baseTemp, local->baseHum, local->baseLux, local->baseBat);
     SerialMon.println(buf);
     mqtt.publish("c/d", buf);
-    SerialMon.println(F("Sending hive Data"));
-    for(size_t i = 0; i < HIVE_BUFFER; i++)
-    {
-      if (hive->bat[i] != 0) {
-        sprintf(buf, "%s,%i,%u,%d,%u,%s,%i,%u,%u,%u", mqttClient, local->baseTemp, local->baseHum, local->baseLux, local->baseBat, hive->id[i], hive->temp[i], hive->hum[i], hive->bat[i], hive->weight[i] );
-        SerialMon.println(buf);
-        mqtt.publish("c/h", buf);
-      }
-    }
-    SerialMon.println(F("Sending scale Data"));
     sprintf(buf, "%s,%i,%li,%li,%li,%li,%li,%li", mqttClient, local->baseTemp, local->weights[0], local->weights[1], local->weights[2], local->weights[3], local->weights[4], local->weights[5]);
     SerialMon.println(buf);
     mqtt.publish("c/s", buf);
@@ -89,7 +78,7 @@ void gprsResetModem() {
 
 void gprsDisplayModemInfo() {
   SerialMon.println(F(":: gprsResetModem"));
-  modem.restart();
+  //modem.restart();
   String modemInfo = modem.getModemInfo();
   SerialMon.print(F(" Modem: "));
   SerialMon.println(modemInfo);

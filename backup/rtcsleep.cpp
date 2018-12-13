@@ -3,24 +3,21 @@
 RTCZero rtc;
 
 void initRtc() {
-  SerialMon.print("Init Rtc ");
   rtc.begin();
   rtc.setTime(hours, minutes, seconds);
   rtc.setDate(day, month, year);
-  SerialMon.println("- done");
 }
 
 void setRtcAlarm(uint8_t alarmMinutes) {
-  SerialMon.print(F(":: setRtcAlarm "));
+  SerialMon.print(F(":: setRtcAlarm - next: "));
   rtc.setAlarmSeconds(00);
   uint8_t min = (rtc.getMinutes()+alarmMinutes)%60;
+  SerialMon.print(min);
   rtc.setAlarmMinutes(min);
   
   rtc.enableAlarm(rtc.MATCH_MMSS);
   rtc.attachInterrupt(alarmMatch);
-  SerialMon.println(F("- done"));
-  SerialMon.print(F(" Next: "));
-  SerialMon.println(min);
+  SerialMon.println(F(" done"));
 }
 
 void sleepCoordinator() {
