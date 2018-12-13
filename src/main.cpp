@@ -36,7 +36,7 @@ void setup() {
   initFlash();
   initRtc();
   initSensors();
-  initScales();
+  //initScales();
   // init communications
   mqttInit(coordinatorAddressString);
   gprsResetModem(); // change by poweron
@@ -65,7 +65,7 @@ void loop() {
   getCoordinatorData(&localData);
   getWeatherData(&localData);
   getDataFromReciever(&hiveDataBuffer);
-  getScaleData(&localData, SCALE_SAMPLE_RATE);
+  //getScaleData(&localData, SCALE_SAMPLE_RATE);
   // show data
   showLocalData(&localData);
   displayHiveBuffer(&hiveDataBuffer);
