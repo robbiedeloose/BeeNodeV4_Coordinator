@@ -14,7 +14,7 @@ void setPinModes() {
   digitalWrite(LED_BUILTIN, HIGH);
   // Gprssleep
   pinMode(GSM_RESET_PIN, OUTPUT);
-  digitalWrite(GSM_RESET_PIN, HIGH);
+  digitalWrite(GSM_RESET_PIN, LOW);
   // Sleep enable
   pinMode(SLEEP_ENABLED, INPUT_PULLUP);
   digitalWrite(SLEEP_ENABLED, HIGH);

@@ -45,7 +45,6 @@ void mqttRegister(char* coordinatorAddressString) {
 
 void mqttSendData(LocalData_t *local, HiveData_t *hive) {
   SerialMon.println(F(":: mqttSendData"));
-  //gprsResetModem();
   gprsConnectNetwork();
   if (mqtt.connect(mqttClient, mqttUser, mqttPswd)) {
     char buf[120] = "";
@@ -115,29 +114,13 @@ void gprsConnectNetwork() {
 
 void gprsEnd() {
   modem.gprsDisconnect();
-  //gprsPowerOff();
   SerialMon.println(F(" Disconnected"));
 }
 
-void gprsPushPowerButton(unsigned long milliseconds) {  
-  digitalWrite(GSM_RESET_PIN, LOW);
-  delay(milliseconds); // should replace this with a 1,5s sleep
+void gprsPowerOn() {
   digitalWrite(GSM_RESET_PIN, HIGH);
 }
 
-uint8_t gprsPowerOn(uint8_t powerstate) {
-  SerialMon.println(F(":: gprsPowerOn"));
-  if (powerstate == 0) {
-    gprsPushPowerButton(1500);
-  }
-  delay(2000);
-  return 1;
-}
-
-uint8_t gprsPowerOff(uint8_t powerstate) {
-  SerialMon.println(F(":: gprsPowerOff"));
-  if (powerstate == 1) {
-    gprsPushPowerButton(1500);
-  }
-  return 0;
+void gprsPowerOff() {
+  digitalWrite(GSM_RESET_PIN, LOW);
 }

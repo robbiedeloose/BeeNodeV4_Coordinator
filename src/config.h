@@ -13,6 +13,7 @@
 #define DEBUG               // comment to use sleep
 #define DELAY_TIMER 125000   // in miliseconds
 #define HIVE_BUFFER 6
+#define RECIEVER_PRESENT true
 
 ///////////////////////// PIN DEFINES //////////////////////////////////////////
 #define flashChipCSPin  4

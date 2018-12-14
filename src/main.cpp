@@ -36,11 +36,13 @@ void setup() {
   initFlash();
   initRtc();
   initSensors();
-  //initScales();
+  initScales();
   // init communications
+  digitalWrite(GSM_RESET_PIN, HIGH);
   mqttInit(coordinatorAddressString);
   gprsResetModem(); // change by poweron
   mqttRegister(coordinatorAddressString);
+  digitalWrite(GSM_RESET_PIN, LOW);
 
   
   
@@ -64,14 +66,17 @@ void loop() {
   // read sensors
   getCoordinatorData(&localData);
   getWeatherData(&localData);
-  getDataFromReciever(&hiveDataBuffer);
-  //getScaleData(&localData, SCALE_SAMPLE_RATE);
+  if (RECIEVER_PRESENT) {
+    getDataFromReciever(&hiveDataBuffer);
+  }
+  getScaleData(&localData, SCALE_SAMPLE_RATE);
   // show data
   showLocalData(&localData);
   displayHiveBuffer(&hiveDataBuffer);
   // send data
+  digitalWrite(GSM_RESET_PIN, HIGH);
   mqttSendData(&localData, &hiveDataBuffer);
-
+  digitalWrite(GSM_RESET_PIN, LOW);
   delay(1000);
   digitalWrite(LED_BUILTIN, LOW); // indicate loop stop
   
