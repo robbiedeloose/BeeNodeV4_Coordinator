@@ -38,13 +38,15 @@ void setup() {
   initSensors();
   initScales();
   // init communications
-  digitalWrite(GSM_RESET_PIN, HIGH);
+  gprsPowerOff();  
+  delay(5000);
+  gprsPowerOn();
+  delay(5000);
   mqttInit(coordinatorAddressString);
   gprsResetModem(); // change by poweron
   mqttRegister(coordinatorAddressString);
-  digitalWrite(GSM_RESET_PIN, LOW);
-
-  
+  delay(5000);
+  gprsPowerOff();  
   
   // indicate setup is done
   digitalWrite(LED_BUILTIN, LOW); 
@@ -74,9 +76,9 @@ void loop() {
   showLocalData(&localData);
   displayHiveBuffer(&hiveDataBuffer);
   // send data
-  digitalWrite(GSM_RESET_PIN, HIGH);
+  gprsPowerOn();
   mqttSendData(&localData, &hiveDataBuffer);
-  digitalWrite(GSM_RESET_PIN, LOW);
+  gprsPowerOff();
   delay(1000);
   digitalWrite(LED_BUILTIN, LOW); // indicate loop stop
   

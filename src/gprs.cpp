@@ -4,7 +4,7 @@
 #include <TinyGsmClient.h>
 #include <PubSubClient.h>
 // Your GPRS credentials
-const char apn[] = "hologram";
+const char apn[] = "hologram"; //hologram of telenetwap.be
 const char user[] = "";
 const char pass[] = "";
 // Server details
@@ -118,9 +118,28 @@ void gprsEnd() {
 }
 
 void gprsPowerOn() {
-  digitalWrite(GSM_RESET_PIN, HIGH);
+  
+   #ifdef SIM800L
+  gprsPushPowerButton(1500);
+  delay(1000);
+  #endif
+  #ifdef SIM800C
+  digitalWrite(GSM_POWER_PIN, HIGH);
+  #endif
 }
 
 void gprsPowerOff() {
-  digitalWrite(GSM_RESET_PIN, LOW);
+  #ifdef SIM800L
+  modem.poweroff();
+  delay(1000);
+  #endif
+  #ifdef SIM800C
+  digitalWrite(GSM_POWER_PIN, LOW);
+  #endif
+}
+
+void gprsPushPowerButton(unsigned long milliseconds) {  
+  digitalWrite(GSM_POWER_PIN, LOW);
+  delay(milliseconds); // should replace this with a 1,5s sleep
+  digitalWrite(GSM_POWER_PIN, HIGH);
 }

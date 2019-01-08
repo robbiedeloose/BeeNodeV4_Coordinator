@@ -19,7 +19,9 @@
 #define flashChipCSPin  4
 #define buildInLed      13
 
-#define GSM_RESET_PIN 3
+#define GSM_POWER_PIN 3
+#define SIM800L
+//#define SIM800C
 
 #define SCALE_1_CLOCK 7   // wit-blauw
 #define SCALE_1_DATA  8   // blauw
